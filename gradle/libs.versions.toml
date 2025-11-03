@@ -5,15 +5,15 @@ kotlin = "2.2.21"
 
 # AndroidX 및 Jetpack
 coreKtx = "1.17.0"
-lifecycle = "2.7.0"             # 라이프사이클 관련 버전을 하나로 통일 (runtime, viewmodel)
+lifecycle = "2.9.4"             # 라이프사이클 관련 버전을 하나로 통일 (runtime, viewmodel)
 activityCompose = "1.11.0"
 composeBom = "2025.10.01"
 
 # 데이터/네트워킹
-kotlinCoroutines = "1.7.3"      # kotlinx-coroutines-android 버전 통일
-room = "2.6.1"                  # Room 최신 안정화 버전 (이전 2.8.3은 높은 버전이라 2.6.1로 변경)
-retrofit = "2.9.0"              # Retrofit 최신 안정화 버전 (이전 3.0.0은 아직 정식 릴리즈가 아닐 가능성 높음)
-okhttp = "4.12.0"               # OkHttp 버전 별도 정의 (인터셉터용)
+kotlinCoroutines = "1.10.2"      # kotlinx-coroutines-android 버전 통일
+room = "2.8.3"                  # Room 최신 안정화 버전 (이전 2.8.3은 높은 버전이라 2.6.1로 변경)
+retrofit = "3.0.0"              # Retrofit 최신 안정화 버전 (이전 3.0.0은 아직 정식 릴리즈가 아닐 가능성 높음)
+okhttp = "5.3.0"               # OkHttp 버전 별도 정의 (인터셉터용)
 
 # KSP 컴파일러
 ksp = "1.9.22-1.0.17"           # Kotlin 버전에 맞는 KSP 버전
@@ -21,7 +21,7 @@ ksp = "1.9.22-1.0.17"           # Kotlin 버전에 맞는 KSP 버전
 # 테스트
 junit = "4.13.2"
 junitVersion = "1.3.0"
-espressoCore = "3.5.1"
+espressoCore = "3.7.0"
 # coroutines = "1.3"             # (삭제) kotlinx-coroutines-android 항목을 사용하므로 중복 제거
 
 [libraries]
