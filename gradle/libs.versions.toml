@@ -1,7 +1,7 @@
 [versions]
 # Gradle 및 Kotlin 플러그인
 agp = "8.13.0"
-kotlin = "2.2.21"
+kotlin = "2.0.21"
 
 # AndroidX 및 Jetpack
 coreKtx = "1.17.0"
