@@ -5,20 +5,160 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.logtalk.ui.theme.LoginColors
+import androidx.compose.ui.graphics.Color
+
+//상단 로고
+@Composable
+fun LoginLogoSection() {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            text = buildAnnotatedString {
+                withStyle(
+                    style = SpanStyle(
+                        color = LoginColors.TextBlack,
+                        fontWeight = FontWeight.Bold
+                    )
+                ) {
+                    append("Log")
+                }
+                withStyle(
+                    style = SpanStyle(
+                        color = LoginColors.TextPurple,
+                        fontWeight = FontWeight.Bold
+                    )
+                ) {
+                    append("Talk")
+                }
+            },
+            fontSize = 50.sp
+        )
+        Text(
+            text = buildAnnotatedString {
+                withStyle(
+                    style = SpanStyle(
+                        color = LoginColors.TextPurple,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                ) {
+                    append("기록")
+                }
+                withStyle(
+                    style = SpanStyle(
+                        color = LoginColors.TextBlack,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                ) {
+                    append("에서 시작되는 \n당신의 마음 이야기")
+                }
+            },
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+//Button용 데이터 프로퍼티
+data class LoginButtonConfig(
+    val text: String,
+    val containerColor: Color,
+    val contentColor: Color
+)
+
+//로그인, 회원가입 버튼
+/**
+ * @param config
+ * @param onClick
+ */
+@Composable
+fun LoginButton(
+    config: LoginButtonConfig,
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick,
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 3.dp,
+            pressedElevation = 1.dp
+        ),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = config.containerColor,
+            contentColor = config.contentColor
+        ),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp)
+    ) {
+        Text(
+            text = config.text, // 파라미터로 받은 값 사용
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium
+        )
+    }
+}
+
+@Composable
+fun LoginButtonSection(
+    onGoogleLoginClick: () -> Unit = {},
+    onSignUpClick: () -> Unit = {},
+) {
+    //구글 계정 객체
+    val googleButtonConfig = LoginButtonConfig(
+        text = "구글 계정으로 로그인 하기",
+        containerColor = LoginColors.Primary,
+        contentColor = LoginColors.TextWhite
+    )
+
+    //회원가입 객체
+    val signUpButtonConfig = LoginButtonConfig(
+        text = "새 계정 만들기 (회원가입)",
+        containerColor = LoginColors.BackgroundWhite,
+        contentColor = LoginColors.TextPurple
+    )
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        //로그인
+        LoginButton(
+            config = googleButtonConfig,
+            onClick = onGoogleLoginClick
+        )
+        //회원가입
+        LoginButton(
+            config = signUpButtonConfig,
+            onClick = onSignUpClick
+        )
+        Text(
+            text = "게스트로 빠르게 시작하기",
+            color = LoginColors.TextGray,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 40.dp)
+        )
+    }
+}
 
 @Composable
 fun LoginScreen(
-    onGoogleLoginClick: () -> Unit = {}
+    onGoogleLoginClick: () -> Unit = {},
+    onSignUpClick: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -33,74 +173,21 @@ fun LoginScreen(
                     end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
                 )
             )
-            .padding(24.dp),
-        contentAlignment = Alignment.Center
+            .padding(32.dp),
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(32.dp)
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween, // 상단-하단 분리
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            //메인 로고
-            Text(
-                text = "LogTalk",
-                color = LoginColors.TextBlack,
-                fontSize = 50.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            //서브 텍스트?
-            Text(
-                text = "기록에서 시작되는\n" +
-                        "당신의 마음 이야기",
-                color = LoginColors.TextGray,
-                fontSize = 20.sp,
-                textAlign = TextAlign.Center
-            )
-
-            //로그인 버튼 (구글 로그인 연결해야됨)
-            Button(
-                //firebase api 연결필요
-                onClick = onGoogleLoginClick,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = LoginColors.Primary,
-                    contentColor = LoginColors.TextWhite
-                ),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            ) {
-                // 구글 로고 아이콘을 나중에 추가 가능
-                Text("구글계정으로 로그인 하기", fontSize = 16.sp, fontWeight = FontWeight.Medium)
-            }
-            Button(
-                //firebase api 연결필요
-                onClick = onGoogleLoginClick,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = LoginColors.BackgroundWhite,
-                    contentColor = LoginColors.TextBlack
-                ),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            ) {
-                // 구글 로고 아이콘을 나중에 추가 가능
-                Text("새 계정 만들기 (회원가입)", fontSize = 16.sp, fontWeight = FontWeight.Medium)
-            }
-
-            Text(
-                text = "게트로 빠르게 시작하기",
-                color = LoginColors.TextGray,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center
+            Spacer(modifier = Modifier.height(300.dp))
+            LoginLogoSection()
+            Spacer(modifier = Modifier.weight(1f))
+            LoginButtonSection(
+                onGoogleLoginClick = onGoogleLoginClick,
+                onSignUpClick = onSignUpClick
             )
         }
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1F1F1F)
-@Composable
-fun LoginScreenPreview() {
-    LoginScreen()
-}
