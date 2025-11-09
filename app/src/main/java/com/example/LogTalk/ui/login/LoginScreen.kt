@@ -1,6 +1,5 @@
 package com.example.logtalk.ui.login
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,12 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.logtalk.R
+import com.example.logtalk.ui.theme.LoginColors
 
 @Composable
 fun LoginScreen(
@@ -23,7 +23,16 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(LoginColors.Background)
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        LoginColors.BackgroundWhite,
+                        LoginColors.BackgroundPurple
+                    ),
+                    start = Offset(0f, 0f),
+                    end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+                )
+            )
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -62,13 +71,13 @@ fun LoginScreen(
                     .height(56.dp)
             ) {
                 // 구글 로고 아이콘을 나중에 추가 가능
-                Text("Continue with Google", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text("구글계정으로 로그인 하기", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
             Button(
                 //firebase api 연결필요
                 onClick = onGoogleLoginClick,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = LoginColors.Background,
+                    containerColor = LoginColors.BackgroundWhite,
                     contentColor = LoginColors.TextBlack
                 ),
                 shape = RoundedCornerShape(12.dp),
@@ -77,9 +86,15 @@ fun LoginScreen(
                     .height(56.dp)
             ) {
                 // 구글 로고 아이콘을 나중에 추가 가능
-                Text("Continue with Google", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text("새 계정 만들기 (회원가입)", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
 
+            Text(
+                text = "게트로 빠르게 시작하기",
+                color = LoginColors.TextGray,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

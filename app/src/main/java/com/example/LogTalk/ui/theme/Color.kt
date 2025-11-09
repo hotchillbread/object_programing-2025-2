@@ -1,10 +1,11 @@
-package com.example.logtalk.ui.login
+package com.example.logtalk.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
 public object LoginColors {
     val Primary = Color(0xFF6282E1)
-    val Background = Color(0xFFFFFFFF)
+    val BackgroundWhite = Color(0xFFFFFFFF)
+    val BackgroundPurple = Color(0xFFD4DCF3)
     val Surface = Color(0xFF374151)
     val TextBlack = Color(0xFF1F1F1F)
     val TextGray = Color(0xFF9CA3AF)
