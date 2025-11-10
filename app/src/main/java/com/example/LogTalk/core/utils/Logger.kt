@@ -16,6 +16,6 @@ object Logger {
     }
 
     fun e(message: String, tag: String = DEFAULT_TAG) {
-        Log.e(tag, message)
+        if (isDebug) Log.e(tag, message)
     }
 }
