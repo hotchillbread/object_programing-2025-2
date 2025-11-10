@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.material.icons.extended)
+    implementation("androidx.navigation:navigation-compose:2.7.7")
     //코루틴 및 라이프사이클 (비동기 처리)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)

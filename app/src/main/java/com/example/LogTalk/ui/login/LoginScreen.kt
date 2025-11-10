@@ -115,8 +115,8 @@ fun LoginButton(
 
 @Composable
 fun LoginButtonSection(
-    onGoogleLoginClick: () -> Unit = {},
-    onSignUpClick: () -> Unit = {},
+    onGoogleLoginClick: () -> Unit,
+    onSignUpClick: () -> Unit,
 ) {
     //구글 계정 객체
     val googleButtonConfig = LoginButtonConfig(
@@ -157,8 +157,8 @@ fun LoginButtonSection(
 
 @Composable
 fun LoginScreen(
-    onGoogleLoginClick: () -> Unit = {},
-    onSignUpClick: () -> Unit = {}
+    onGoogleLoginClick: () -> Unit,
+    onSignUpClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
