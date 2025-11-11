@@ -9,6 +9,14 @@ android {
     namespace = "com.example.logtalk"
     compileSdk = 36
 
+    //종속성 충돌 해결
+    configurations.all {
+        resolutionStrategy {
+            // libs.versions.kotlin.get()을 사용하여 버전 카탈로그의 Kotlin 버전을 참조
+            force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${libs.versions.kotlin.get()}")
+        }
+    }
+
     defaultConfig {
         applicationId = "com.example.logtalk"
         minSdk = 24
@@ -29,11 +37,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         buildConfig = true
@@ -61,6 +69,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.material.icons.extended)
+    implementation("androidx.navigation:navigation-compose:2.7.7")
     //코루틴 및 라이프사이클 (비동기 처리)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
@@ -87,4 +96,3 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
-
