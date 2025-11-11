@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx) // Room 코루틴/Kotlin 확장 기능
     ksp(libs.androidx.room.compiler)
+    //kapt(libs.androidx.room.compiler)
 
     // 네트워크 (Retrofit + JSON)
     implementation(libs.retrofit)
