@@ -9,6 +9,14 @@ android {
     namespace = "com.example.logtalk"
     compileSdk = 36
 
+    //종속성 충돌 해결
+    configurations.all {
+        resolutionStrategy {
+            // libs.versions.kotlin.get()을 사용하여 버전 카탈로그의 Kotlin 버전을 참조
+            force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${libs.versions.kotlin.get()}")
+        }
+    }
+
     defaultConfig {
         applicationId = "com.example.logtalk"
         minSdk = 24
@@ -87,4 +95,3 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
-
