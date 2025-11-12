@@ -2,6 +2,7 @@ package com.example.logtalk.ui.navigation
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat // 예시 아이콘
 import androidx.compose.material.icons.filled.Home
@@ -10,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -40,7 +42,7 @@ fun MainScreen() {
     Scaffold(
         bottomBar = {
             NavigationBar(
-                modifier = Modifier.height(48.dp)
+                modifier = Modifier.height(104.dp)
             ) {
                 val navBackStackEntry by mainNavController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
@@ -48,7 +50,11 @@ fun MainScreen() {
                 items.forEach { screen ->
                     val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                     NavigationBarItem(
-                        icon = { Icon(screen.icon, contentDescription = screen.label) },
+                        icon = { Icon(
+                            screen.icon,
+                            contentDescription = screen.label,
+                            modifier = Modifier.size(30.dp),
+                        ) },
                         label = { Text(screen.label) },
                         selected = isSelected,
                         onClick = {
@@ -66,6 +72,11 @@ fun MainScreen() {
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = LoginColors.TextPurple,
                             unselectedIconColor = LoginColors.TextBlack,
+
+                            selectedTextColor = LoginColors.TextPurple,
+                            unselectedTextColor = LoginColors.TextBlack,
+
+                            indicatorColor = Color.Transparent,
                         )
                     )
                 }
@@ -77,8 +88,6 @@ fun MainScreen() {
             navController = mainNavController,
             startDestination = MainScreenRoutes.Home.route, //시작은 home부터 하도록 설정
             modifier = Modifier.padding(innerPadding)
-
-
             
         ) {
             composable(MainScreenRoutes.Home.route) { HomeScreen() }
