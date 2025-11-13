@@ -1,8 +1,11 @@
 package com.example.logtalk.ui.navigation
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat // 예시 아이콘
 import androidx.compose.material.icons.filled.Home
@@ -41,44 +44,56 @@ fun MainScreen() {
 
     Scaffold(
         bottomBar = {
-            NavigationBar(
-                modifier = Modifier.height(104.dp)
-            ) {
-                val navBackStackEntry by mainNavController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
+            Column(modifier = Modifier.fillMaxWidth()) {
 
-                items.forEach { screen ->
-                    val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
-                    NavigationBarItem(
-                        icon = { Icon(
-                            screen.icon,
-                            contentDescription = screen.label,
-                            modifier = Modifier.size(30.dp),
-                        ) },
-                        label = { Text(screen.label) },
-                        selected = isSelected,
-                        onClick = {
-                            mainNavController.navigate(screen.route) {
-                                // 맨위 팝업 시키기
-                                popUpTo(mainNavController.graph.findStartDestination().id) {
-                                    saveState = true
+                Divider(
+                    color = Color.LightGray,
+                    thickness = 1.dp
+                )
+
+                NavigationBar(
+                    containerColor = Color.Transparent,
+                    modifier = Modifier.height(104.dp)
+                ) {
+                    val navBackStackEntry by mainNavController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStackEntry?.destination
+
+                    items.forEach { screen ->
+                        val isSelected =
+                            currentDestination?.hierarchy?.any { it.route == screen.route } == true
+                        NavigationBarItem(
+                            icon = {
+                                Icon(
+                                    screen.icon,
+                                    contentDescription = screen.label,
+                                    modifier = Modifier.size(30.dp),
+                                )
+                            },
+                            label = { Text(screen.label) },
+                            selected = isSelected,
+                            onClick = {
+                                mainNavController.navigate(screen.route) {
+                                    // 맨위 팝업 시키기
+                                    popUpTo(mainNavController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    // 같은 목적지 재실행 방지
+                                    launchSingleTop = true
+                                    // 상태 복원
+                                    restoreState = true
                                 }
-                                // 같은 목적지 재실행 방지
-                                launchSingleTop = true
-                                // 상태 복원
-                                restoreState = true
-                            }
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = LoginColors.TextPurple,
-                            unselectedIconColor = LoginColors.TextBlack,
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = LoginColors.TextPurple,
+                                unselectedIconColor = LoginColors.TextGray,
 
-                            selectedTextColor = LoginColors.TextPurple,
-                            unselectedTextColor = LoginColors.TextBlack,
+                                selectedTextColor = LoginColors.TextPurple,
+                                unselectedTextColor = LoginColors.TextGray,
 
-                            indicatorColor = Color.Transparent,
+                                indicatorColor = Color.Transparent,
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
