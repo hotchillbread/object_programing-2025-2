@@ -34,7 +34,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             // 초기 Persona Data 로드 시도
             val loadedPersona = try { loadPersonaUseCase() } catch (e: Exception) { PersonaData() }
-            _uiState.update {
+            _uiState.update { 
                 it.copy(persona = loadedPersona, currentEditingPersona = loadedPersona)
             }
         }
@@ -50,31 +50,31 @@ class SettingsViewModel @Inject constructor(
         when (intent) {
             // 💡 편집 모드 진입 및 취소
             SettingsIntent.ClickEditPersona -> {
-                _uiState.update {
+                _uiState.update { 
                     it.copy(isEditingPersona = true, currentEditingPersona = it.persona) // 원본을 임시 상태로 복사
                 }
             }
             SettingsIntent.CancelEdit -> {
-                _uiState.update {
+                _uiState.update { 
                     it.copy(isEditingPersona = false, currentEditingPersona = it.persona) // 원본으로 복구
                 }
             }
             // 💡 텍스트 입력 시 임시 상태 업데이트
             is SettingsIntent.UpdateEditingDescription -> {
-                _uiState.update {
+                _uiState.update { 
                     it.copy(currentEditingPersona = it.currentEditingPersona.copy(description = intent.newDescription))
                 }
             }
             // 💡 데이터 저장
             is SettingsIntent.SavePersona -> {
                 savePersonaUseCase(intent.persona)
-                _uiState.update {
+                _uiState.update { 
                     it.copy(persona = intent.persona, isEditingPersona = false)
                 }
             }
-
+            
             // 💡 4단계: 삭제 관련 로직 (다음 단계에서 완성)
-            else -> {}
+            else -> {} 
         }
     }
 }
