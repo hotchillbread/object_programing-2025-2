@@ -77,7 +77,7 @@ fun MainScreen() {
 
                 NavigationBar(
                     containerColor = Color.White,
-                    modifier = Modifier.height(68.dp),
+                    modifier = Modifier.height(72.dp),
                     windowInsets = WindowInsets(0, 0, 0, 0)
                 ) {
                     val navBackStackEntry by mainNavController.currentBackStackEntryAsState()
