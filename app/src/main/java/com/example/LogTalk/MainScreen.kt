@@ -139,7 +139,13 @@ fun MainScreen() {
                 }
             )
             }
-            composable(MainScreenRoutes.Settings.route) { SettingsScreen() }
+            composable(MainScreenRoutes.Settings.route) {
+                SettingsScreen(
+                    onBackClick = {
+                        mainNavController.popBackStack() // HomeScreen으로 돌아가기
+                    }
+                )
+            }
         }
     }
 }

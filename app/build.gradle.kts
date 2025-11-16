@@ -1,8 +1,11 @@
 plugins {
+    id("com.google.dagger.hilt.android")
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    id("org.jetbrains.kotlin.kapt")
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -39,6 +42,7 @@ android {
         buildConfig = true
         compose = true
         viewBinding = true
+        dataBinding = true
     }
 }
 
@@ -57,7 +61,17 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.material.icons.extended)
-    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("com.google.android.material:material:1.11.0")
+
+    // Navigation Components (Fragment용)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // Fragment KTX (viewModels delegate)
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
+
     //코루틴 및 라이프사이클 (비동기 처리)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
@@ -66,8 +80,9 @@ dependencies {
     // 로컬 데이터베이스 (Room)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx) // Room 코루틴/Kotlin 확장 기능
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
     ksp(libs.androidx.room.compiler)
-    //kapt(libs.androidx.room.compiler)
 
     // 네트워크 (Retrofit + JSON)
     implementation(libs.retrofit)

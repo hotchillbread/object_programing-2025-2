@@ -1,6 +1,8 @@
 package com.example.logtalk.ui.settings
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,29 +18,80 @@ fun SettingCard(
     buttonText: String,
     buttonColor: Color,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    showCancelButton: Boolean = false,
+    onCancel: (() -> Unit)? = null
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 icon()
                 Column {
                     Text(title, style = MaterialTheme.typography.titleMedium)
-                    Spacer(Modifier.height(4.dp))
-                    descriptionComposable() // 내용 Composable 호출
+                    if (subtitle != null) {
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = subtitle,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Gray
+                        )
+                    }
                 }
             }
             Spacer(Modifier.height(16.dp))
+            descriptionComposable() // 내용 Composable 호출
+            Spacer(Modifier.height(16.dp))
 
-            Button(
-                onClick = onClick,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
-            ) {
-                Text(buttonText, color = Color.White)
+            if (showCancelButton && onCancel != null) {
+                // 편집 모드: 저장과 취소 버튼을 나란히 배치
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = onClick,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(buttonText, color = Color.White)
+                    }
+                    OutlinedButton(
+                        onClick = onCancel,
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f))
+                    ) {
+                        Text("취소", color = Color.Black)
+                    }
+                }
+            } else {
+                // 일반 모드: 버튼 하나만
+                if (buttonColor == Color.White) {
+                    // 흰색 버튼은 OutlinedButton으로 표시
+                    OutlinedButton(
+                        onClick = onClick,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f))
+                    ) {
+                        Text(buttonText, color = Color.Black)
+                    }
+                } else {
+                    Button(
+                        onClick = onClick,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(buttonText, color = Color.White)
+                    }
+                }
             }
         }
     }
@@ -49,7 +102,8 @@ fun SettingCard(
 fun AppInfoCard(data: AppInfoData, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
             Text("앱 정보", style = MaterialTheme.typography.titleMedium)

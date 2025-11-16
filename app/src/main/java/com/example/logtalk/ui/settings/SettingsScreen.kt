@@ -1,56 +1,139 @@
 package com.example.logtalk.ui.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
+fun SettingsScreen(
+    viewModel: SettingsViewModel = hiltViewModel(),
+    onBackClick: () -> Unit = {}
+) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        // 상단 앱바
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(horizontal = 16.dp, vertical = 16.dp)
+        ) {
+            // 왼쪽: 뒤로가기 아이콘 + 설정 텍스트
+            Row(
+                modifier = Modifier.align(Alignment.CenterStart),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = onBackClick
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "뒤로가기",
+                        tint = Color.Black
+                    )
+                }
+                Text(
+                    text = "설정",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+            }
+
+            // 중앙: LogTalk 로고
+            Row(
+                modifier = Modifier.align(Alignment.Center),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Log",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.Black
+                )
+                Text(
+                    text = "Talk",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF6282E1) // 파란색
+                )
+            }
+        }
+
+        HorizontalDivider(
+            color = Color(0xFFF0F0F0),
+            thickness = 1.dp
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
 
         // AI 페르소나 설정 카드
         SettingCard(
             title = "AI 페르소나 설정",
+            subtitle = "AI의 성격과 대화 스타일을 설정합니다",
             icon = { Icon(Icons.Default.Person, contentDescription = "페르소나 아이콘") },
 
             // description Composable 분기
             descriptionComposable = {
                 if (uiState.isEditingPersona) {
                     // 편집 모드: 텍스트 입력 필드
-                    OutlinedTextField(
+                    TextField(
                         value = uiState.currentEditingPersona.description,
                         onValueChange = { newDesc ->
                             viewModel.sendIntent(SettingsIntent.UpdateEditingDescription(newDesc))
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 120.dp),
-                        label = { Text("페르소나 내용") },
-                        textStyle = MaterialTheme.typography.bodySmall
+                            .heightIn(min = 150.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color(0xFFF5F5F5),
+                            unfocusedContainerColor = Color(0xFFF5F5F5),
+                            disabledContainerColor = Color(0xFFF5F5F5),
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        textStyle = MaterialTheme.typography.bodyMedium
                     )
                 } else {
                     // 읽기 모드
                     Text(
                         text = uiState.persona.description,
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
                     )
                 }
             },
 
             // 버튼 텍스트와 색상 분기 (저장/편집 모드)
             buttonText = if (uiState.isEditingPersona) "저장" else "편집",
-            buttonColor = if (uiState.isEditingPersona) Color.Black else MaterialTheme.colorScheme.primary,
+            buttonColor = if (uiState.isEditingPersona) Color.Black else Color.White,
+            showCancelButton = uiState.isEditingPersona,
+            onCancel = if (uiState.isEditingPersona) {
+                { viewModel.sendIntent(SettingsIntent.CancelEdit) }
+            } else null,
 
             onClick = {
                 if (uiState.isEditingPersona) {
@@ -63,16 +146,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
             }
         )
 
-        // 취소 버튼 (편집 모드에서만 표시)
-        if (uiState.isEditingPersona) {
-            Spacer(Modifier.height(8.dp))
-            OutlinedButton(
-                onClick = { viewModel.sendIntent(SettingsIntent.CancelEdit) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("취소")
-            }
-        }
+        // 취소 버튼은 이제 SettingCard 내부에서 처리되므로 제거
 
         Spacer(Modifier.height(16.dp))
 
@@ -113,6 +187,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
                     }
                 }
             )
+        }
         }
     }
 }
