@@ -1,9 +1,11 @@
 package com.example.logtalk.ui.chat
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons // Material 2/3 공통
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -24,6 +26,7 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
@@ -267,22 +270,40 @@ fun MessageInput(
             .padding(horizontal = 8.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        OutlinedTextField(
+        //OutlinedTextField 대신 BasicTextField 사용으로 텍스트 중앙에 배치하도록
+        BasicTextField(
             value = currentText,
             onValueChange = onTextChange,
-            textStyle = TextStyle(fontSize = 16.sp),
-            placeholder = { Text(text = "메시지 전송하기" ) },
-            modifier = Modifier.weight(1f)
-                .height(52.dp)
+            modifier = Modifier
+                .weight(1f)
+                .height(52.dp) 
                 .focusRequester(focusRequester),
-            shape = RoundedCornerShape(24.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                backgroundColor = ChatColors.BackgroundInput,
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                cursorColor = ChatColors.BackgroundPuple
-            ),
+            textStyle = TextStyle(fontSize = 16.sp, color = LocalContentColor.current), 
             singleLine = true,
+            cursorBrush = SolidColor(ChatColors.BackgroundPuple),
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = ChatColors.BackgroundInput,
+                            shape = RoundedCornerShape(24.dp)
+                        )
+                        .padding(horizontal = 16.dp),
+                    contentAlignment = Alignment.CenterStart 
+                ) {
+                    // 텍스트가 비어있을 때만 플레이스홀더 표시
+                    if (currentText.isEmpty()) {
+                        Text(
+                            text = "메시지 전송하기",
+                            fontSize = 16.sp,
+                            color = Color.Gray.copy(alpha = 0.7f) 
+                        )
+                    }
+                    // 실제 텍스트 입력 필드
+                    innerTextField()
+                }
+            }
         )
 
         Spacer(modifier = Modifier.width(8.dp))
