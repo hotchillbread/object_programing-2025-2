@@ -1,16 +1,16 @@
 plugins {
+    id("com.google.dagger.hilt.android")
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
-    id("kotlin-kapt")
-    id("com.google.dagger.hilt.android") version "2.50"
-    id("androidx.navigation.safeargs.kotlin") version "2.7.7"
+    id("org.jetbrains.kotlin.kapt")
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
     namespace = "com.example.logtalk"
-    compileSdk = 34
+    compileSdk = 34 // 36은 아직 미지원 가능성이 높아 34로 안정화
 
     defaultConfig {
         applicationId = "com.example.logtalk"
@@ -31,27 +31,18 @@ android {
             )
         }
     }
-
     compileOptions {
-        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
     kotlinOptions {
         jvmTarget = "17"
     }
-
     buildFeatures {
         buildConfig = true
         compose = true
         viewBinding = true
         dataBinding = true
-    }
-
-    kapt {
-        correctErrorTypes = true
-        useBuildCache = true
     }
 }
 
@@ -70,42 +61,33 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.material.icons.extended)
-
-    // Material Components
     implementation("com.google.android.material:material:1.11.0")
 
-    // CoordinatorLayout
-    implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
+    // Navigation Components (Fragment용)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
 
-    // Fragment KTX (for viewModels())
+    // Fragment KTX (viewModels delegate)
     implementation("androidx.fragment:fragment-ktx:1.6.2")
 
-    // Navigation
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
-
-    // Hilt Dependency Injection
-    implementation("com.google.dagger:hilt-android:2.50")
-    kapt("com.google.dagger:hilt-android-compiler:2.50")
-
-    // 코루틴 및 라이프사이클 (비동기 처리)
+    //코루틴 및 라이프사이클 (비동기 처리)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     // 로컬 데이터베이스 (Room)
     implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.ktx) // Room 코루틴/Kotlin 확장 기능
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
     ksp(libs.androidx.room.compiler)
 
     // 네트워크 (Retrofit + JSON)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.okhttp3.logging.interceptor)
-
-    // Core Library Desugaring (for Java 8+ APIs on older Android versions)
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     // 테스트 의존성
     testImplementation(libs.junit)
@@ -116,4 +98,3 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
-

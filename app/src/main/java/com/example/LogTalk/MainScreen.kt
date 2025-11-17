@@ -27,11 +27,9 @@ import androidx.navigation.compose.*
 import com.example.logtalk.ui.navigation.MainScreenRoutes
 import com.example.logtalk.ui.chat.ChatScreen
 import com.example.logtalk.ui.chat.Message
+import com.example.logtalk.ui.settings.SettingsScreen
 import com.example.logtalk.ui.theme.LoginColors
 import com.example.logtalk.ui.home.HomeScreen
-
-@Composable fun SettingsScreen() { Text("설정 화면") }
-
 
 @Composable
 fun MainScreen() {
@@ -141,7 +139,13 @@ fun MainScreen() {
                 }
             )
             }
-            composable(MainScreenRoutes.Settings.route) { SettingsScreen() }
+            composable(MainScreenRoutes.Settings.route) {
+                SettingsScreen(
+                    onBackClick = {
+                        mainNavController.popBackStack() // HomeScreen으로 돌아가기
+                    }
+                )
+            }
         }
     }
 }
