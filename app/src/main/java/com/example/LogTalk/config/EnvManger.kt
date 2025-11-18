@@ -1,7 +1,6 @@
 package com.example.logtalk.config
 
 import com.example.logtalk.BuildConfig
-import com.example.logtalk.R
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
@@ -26,7 +25,7 @@ object EnvManager {
                 if (task.isSuccessful) {
                     val updated = task.result
                     Logger.d("Remote Config 패치 성공. 업데이트 여부: $updated")
-                    Logger.d("API Base URL: ${getApiBaseUrl()}")
+                    Logger.d("API Base URL: ${getOpenaiApiKey()}")
 
                 } else {
                     Logger.e("Remote Config 패치 실패")
@@ -34,12 +33,8 @@ object EnvManager {
             }
     }
 
-    // 환경 변수를 가져오기
-    fun getApiBaseUrl(): String {
-        return remoteConfig.getString("api_base_url")
-    }
-
-    fun isFeatureFlagEnabled(): Boolean {
-        return remoteConfig.getBoolean("feature_flag_enabled")
+    // api key가져오기
+    fun getOpenaiApiKey(): String {
+        return remoteConfig.getString("openai_api_key_url")
     }
 }
