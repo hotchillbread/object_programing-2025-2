@@ -112,9 +112,40 @@ class OpenAILLMChatService(
     }
 }
 
-class OpenIllegitimateSummarize(private val apiKey: String): OpenaiLLM {
+class OpenIllegitimateSummarize(private val apiKey: String, private val firstMessage: String): OpenaiLLM {
+
+    private val client = OpenAI(
+        token = apiKey,
+        timeout = Timeout(socket = 60.seconds)
+    )
+    private val titleMessage: MutableList<ChatMessage> = mutableListOf()
+    init {
+        // 1. 요약 작업을 지시하는 시스템 프롬프트 (혹은 사용자 메시지)
+        titleMessage.add(
+            ChatMessage(
+                role = ChatRole.System, // 혹은 ChatRole.User
+                content = "당신은 주어진 내용을 바탕으로 대화 주제를 간결하게 요약하는 전문 요약가입니다."
+            )
+        )
+
+        titleMessage.add(
+            ChatMessage(
+                role = ChatRole.User,
+                content = "다음 내용을 바탕으로 대화 주제가 무엇인지 간략하게 요약해줘:\n$firstMessage"
+            )
+        )
+    }
     override suspend fun getResponse(prompt: String): String {
-        TODO("제목 요약용 로직")
+        val request = ChatCompletionRequest(
+            model = ModelId("gpt-4o-mini"),
+            // ✨ 3. 저장된 전체 히스토리 리스트를 messages로 전송
+            messages = titleMessage,
+            maxTokens = 2000
+        )
+
+        val response = client.chatCompletion(request)
+
+        return response.choices.firstOrNull()?.message?.content ?: ""
     }
 
 }
