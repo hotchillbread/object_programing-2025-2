@@ -1,4 +1,4 @@
-package com.example.logtalk.core.utils.model
+package com.example.logtalk.domain.model
 
 import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.chat.ChatMessage

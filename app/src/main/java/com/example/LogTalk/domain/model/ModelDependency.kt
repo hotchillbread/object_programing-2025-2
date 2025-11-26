@@ -1,4 +1,4 @@
-package com.example.logtalk.core.utils.model
+package com.example.logtalk.domain.model
 
 import com.example.logtalk.config.EnvManager
 

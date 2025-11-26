@@ -1,4 +1,4 @@
-package com.example.logtalk.core.utils.model
+package com.example.logtalk.domain.model
 
 import com.aallam.openai.api.audio.TranscriptionRequest
 import com.aallam.openai.api.file.FileSource
