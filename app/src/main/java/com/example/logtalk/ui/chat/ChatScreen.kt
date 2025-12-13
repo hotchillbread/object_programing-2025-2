@@ -13,11 +13,11 @@ import com.example.logtalk.ui.chat.viewmodel.ChatViewModel
 
 
 @Composable
-fun ChatScreen(
+public fun ChatScreen(
     // TODO: NavController 또는 Navigation 콜백을 위한 파라미터 추가
     onBackClick: () -> Unit,
     // ViewModel은 Hilt/Koin 등의 DI 라이브러리를 통해 주입받는 것이 권장되지만, 여기서는 임시로 viewModel() 사용
-    viewModel: ChatViewModel = viewModel()
+    viewModel: ChatViewModel
 ) {
     val uiState = viewModel.uiState
 

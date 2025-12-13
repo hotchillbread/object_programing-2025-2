@@ -2,14 +2,20 @@ package com.example.logtalk.domain.chat
 
 import com.example.logtalk.core.utils.model.OpenAILLMChatService
 import com.example.logtalk.domain.chat.ChatRepository
+import com.example.logtalk.data.local.MessageData
+import com.example.logtalk.data.local.MessageDao
 import com.example.logtalk.ui.chat.data.Message
-import com.example.logtalk.core.utils.model.OpenaiLLM
 import kotlinx.coroutines.delay
 
 class ChatRepositoryImpl(
+    private val chatDao: MessageDao,
     private val llmService: OpenAILLMChatService,
-    // TitleSummarizationLLMService도 주입받을 수 있음 (제목 관련 로직이 필요하다면)
 ) : ChatRepository {
+
+    override suspend fun saveMessage(message: Message, parentTitleId: Long) {
+        val entity = message.toEntity(parentTitleId)
+        chatDao.insertMessage(entity)
+    }
 
     override suspend fun getBotResponse(userMessage: String, history: List<Message>): String {
         //불러오기
@@ -26,4 +32,16 @@ class ChatRepositoryImpl(
         delay(1000L)
         llmService.resetHistory()
     }
+}
+
+//message 를 db에 넣을 messageData로 변환해주는 코드
+fun Message.toEntity(parentTitleId: Long): MessageData {
+
+    val senderName = if (this.isUser) "User" else "Bot"
+
+    return MessageData(
+        parentTitleId = parentTitleId,
+        sender = senderName,
+        content = this.text,
+    )
 }
