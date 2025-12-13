@@ -1,51 +1,37 @@
-package com.example.logtalk.domain.usecase
+package com.example.logtalk.domain.chat
 
-import com.example.logtalk.domain.chat.ChatRepository
 import com.example.logtalk.ui.chat.data.Message
+import com.example.logtalk.domain.chat.ChatRepository
 
-class ChatUseCase(
-    private val repository: ChatRepository
+class SendMessageUseCase(
+    private val chatRepository: ChatRepository
 ) {
-    suspend fun getBotResponseWithMessageUpdate(
+    suspend operator fun invoke(
         userMessageText: String,
-        currentMessages: List<Message>
-    ): List<Message> {
-        // 1. 사용자 메시지 생성
+        history: List<Message>,
+        parentTitleId: Long
+    ): Message {
+        //메세지 객체 생성 & 저장
         val userMessage = Message(
             id = System.currentTimeMillis(),
             text = userMessageText,
             isUser = true
-        )
-        val messagesWithUser = currentMessages + userMessage
 
-        // 응답 요청
-        val botResponseText = repository.getBotResponse(
-            userMessage = userMessageText,
-            history = currentMessages // 전체 맥락 전달
         )
+        chatRepository.saveMessage(userMessage, parentTitleId)
 
-        // 3. 봇 메시지 생성
+        //응답 요청
+        val botResponse = chatRepository.getBotResponse(userMessageText, history + userMessage)
+        //응답 객체 생성
         val botMessage = Message(
-            id = System.currentTimeMillis() + 1,
-            text = botResponseText,
-            isUser = false,
+            id = System.currentTimeMillis() + 1, // 충돌 방지를 위해 +1
+            text = botResponse,
+            isUser = false
         )
 
-        // 4. 새로운 목록 반환
-        return messagesWithUser + botMessage
-    }
+        //응답 저장
+        chatRepository.saveMessage(botMessage, parentTitleId)
 
-    /**
-     * 채팅 기록을 신고합니다.
-     */
-    suspend fun reportChat() {
-        repository.reportChatHistory()
-    }
-
-    /**
-     * 채팅 기록을 삭제합니다.
-     */
-    suspend fun deleteChat() {
-        repository.deleteChatHistory()
+        return botMessage
     }
 }
