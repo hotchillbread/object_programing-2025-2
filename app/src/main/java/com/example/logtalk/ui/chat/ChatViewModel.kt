@@ -5,77 +5,160 @@
     import androidx.compose.runtime.setValue
     import androidx.lifecycle.ViewModel
     import androidx.lifecycle.viewModelScope
+    import com.example.logtalk.domain.chat.CreateNewChatUseCase
+    import com.example.logtalk.domain.chat.DeleteChatUseCase
+    import com.example.logtalk.domain.chat.GenerateAndSaveTitleUseCase // 새 Use Case 필요
+    import com.example.logtalk.domain.chat.GetChatHistoryUseCase
+    import com.example.logtalk.domain.chat.SendMessageUseCase
     import com.example.logtalk.ui.chat.data.ChatUiState
-    import com.example.logtalk.ui.chat.data.Message
-    import kotlinx.coroutines.delay // 임시 딜레이를 위해 사용
+    import com.example.logtalk.ui.chat.data.Title // Title 모델 필요
+    import kotlinx.coroutines.flow.collectLatest
     import kotlinx.coroutines.launch
 
-    class ChatViewModel : ViewModel() {
 
-        //UI 상태
+    class ChatViewModel(
+        private val initialTitleId: Long,
+        private val createNewChatUseCase: CreateNewChatUseCase,
+        private val getChatHistoryUseCase: GetChatHistoryUseCase,
+        private val sendMessageUseCase: SendMessageUseCase,
+        private val deleteChatUseCase: DeleteChatUseCase,
+        private val generateAndSaveTitleUseCase: GenerateAndSaveTitleUseCase // 제목 생성 Use Case 추가
+    ) : ViewModel() {
+
+        // UI 상태
         var uiState by mutableStateOf(ChatUiState())
             private set
+
+        // 현재 활성화된 채팅방 ID
+        private var currentTitleId: Long = initialTitleId
+
+        // 첫 메시지 전송 여부 (제목 생성을 한 번만 하기 위함)
+        private var isFirstMessageSent: Boolean = false
+
+        // 현재 채팅방의 Title 객체 (삭제 등을 위해 필요)
+        private var currentChatTitle: Title? = null
+
+
+        init {
+            // ViewModel 초기화 시, 채팅방 ID에 따라 로직 분기
+            handleChatInitialization()
+        }
+
+        // --- 1. 초기화 및 데이터 로딩 ---
+
+        private fun handleChatInitialization() {
+            viewModelScope.launch {
+                if (currentTitleId == -1L) {
+                    // 1.1. 새 채팅방 생성
+                    currentTitleId = createNewChatUseCase()
+                    // 새 채팅방은 당연히 첫 메시지 전송 전 상태입니다.
+                    isFirstMessageSent = false
+                } else {
+                    // 1.2. 기존 채팅방 기록 로드
+                    // 기존 채팅방은 이미 제목이 생성되어 있어야 합니다.
+                    isFirstMessageSent = true
+                }
+
+                // 데이터 구독 시작
+                observeChatHistory(currentTitleId)
+            }
+        }
+
+        // 메시지 기록 Flow 구독 및 UI 상태 업데이트
+        private fun observeChatHistory(titleId: Long) {
+            viewModelScope.launch {
+                getChatHistoryUseCase(titleId).collectLatest { messages ->
+                    uiState = uiState.copy(
+                        messages = messages,
+                        // 메시지 로드 시 로딩 상태 해제
+                        isLoading = false
+                    )
+                    // 현재 메시지 수를 기반으로 첫 메시지 전송 여부 업데이트 (앱 재시작 시 필요)
+                    isFirstMessageSent = messages.size >= 2 // 사용자 메시지 + 봇 응답이 있으면 제목 생성 완료로 간주
+                }
+            }
+        }
+
+        // --- 2. 입력 및 상태 변경 ---
 
         // 입력 텍스트 변경
         fun updateTextInput(newText: String) {
             uiState = uiState.copy(textInput = newText)
         }
 
-        // 메시지 전송 로직
+        // --- 3. 핵심 로직: 메시지 전송 ---
+
         fun sendMessage() {
-            if (uiState.textInput.isBlank()) return
+            if (uiState.textInput.isBlank() || uiState.isLoading) return
 
             val userMessageText = uiState.textInput
-            updateTextInput("") // 입력 필드 초기화
+            val history = uiState.messages
 
-            //사용자 메시지를 목록에 추가
-            val userMessage = Message(
-                id = System.currentTimeMillis(), // 임시값
-                text = userMessageText,
-                isUser = true
-            )
-            val newMessages = uiState.messages + userMessage
+            // 1. UI 상태 즉시 업데이트 (입력 필드 초기화 및 로딩 시작)
             uiState = uiState.copy(
-                messages = newMessages,
+                textInput = "",
                 isLoading = true
             )
 
-            /*봇 응답, 목록에 추가
             viewModelScope.launch {
-                // TODO: 실제로는 서버 API 호출 또는 로컬 LLM 추론 로직 구현
+                try {
+                    // 2. Use Case를 통해 메시지 전송 및 응답 처리
+                    sendMessageUseCase(userMessageText, history, currentTitleId)
 
-                val botResponse = generateBotResponse(userMessageText)
-                val botMessage = Message(
-                    id = System.currentTimeMillis() + 1, // 임시 ID
-                    text = botResponse,
-                    isUser = false,
-                )
+                    // 3. 첫 메시지 전송 완료 시 제목 생성 로직 실행
+                    if (!isFirstMessageSent) {
+                        // 첫 메시지(userMessageText)를 기반으로 제목 생성 요청
+                        generateAndSaveTitleUseCase(currentTitleId, userMessageText)
+                        isFirstMessageSent = true
+                    }
 
-                uiState = uiState.copy(
-                    messages = uiState.messages + botMessage,
-                    isLoading = false
-                )
-                // TODO: 메시지 스크롤을 가장 아래로 이동시키는 로직 구현 (Compose LazyListState 사용)
-            } */
+                } catch (e: Exception) {
+                    // 오류 처리
+                    uiState = uiState.copy(
+                        errorMessage = "메시지 전송 실패: ${e.localizedMessage}",
+                    )
+                } finally {
+                    uiState = uiState.copy(
+                        isLoading = false
+                    )
+                }
+            }
         }
 
-        // TODO: 음성 메시지 전송 로직 구현 (후순위)
-        fun sendVoiceMessage() {
-            // 음성 녹음 시작/중지 및 변환 로직 구현
-        }
+        // --- 4. 메뉴 액션 처리 (Composable과 연동) ---
 
-        // TODO: 비슷한 상담 찾기 로직 구현 (페이지 분리해야함)
-        fun findSimilarConsultation() {
-            // 홈 화면 또는 별도의 검색 화면으로 이동/API 호출 로직 구현
-        }
-
-        // TODO: 채팅 신고 로직 구현 (후순위)
         fun reportChat() {
-            // 신고 호출 로직 구현
+            // TODO: 신고 Use Case 구현 후 연결
+            viewModelScope.launch {
+                // chatRepository.reportChatHistory() // 구현 예정
+                uiState = uiState.copy(errorMessage = "신고가 접수되었습니다. (로직 임시 처리)")
+            }
         }
 
-        // TODO: 채팅 삭제 로직 구현
-        fun deleteChat() {
-            // 채팅 기록 삭제 API 호출 및 UI 업데이트 로직 구현
+        fun deleteChat(onChatDeleted: () -> Unit) {
+            viewModelScope.launch {
+                try {
+                    // 삭제를 위해 현재 Title 객체 생성 (ID 기반)
+                    val titleToDelete = Title(titleId = currentTitleId, title = "", embedding = null, createdAt = 0L)
+
+                    deleteChatUseCase(titleToDelete)
+
+                    // 삭제 완료 후 네비게이션 콜백 호출
+                    onChatDeleted()
+                } catch (e: Exception) {
+                    uiState = uiState.copy(errorMessage = "채팅방 삭제 실패: ${e.localizedMessage}")
+                }
+            }
+        }
+
+
+        fun findSimilarConsultation() {
+            // 라우팅은 UI/Composable 레이어에서 처리
+            uiState = uiState.copy(errorMessage = "유사 상담 찾기 화면으로 이동합니다.")
+        }
+
+        fun sendVoiceMessage() {
+            // TODO: 음성 메시지 로직 구현
+            uiState = uiState.copy(errorMessage = "음성 메시지 기능은 준비 중입니다.")
         }
     }

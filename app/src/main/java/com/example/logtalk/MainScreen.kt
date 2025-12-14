@@ -25,9 +25,13 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.*
+import androidx.navigation.navArgument
+import com.example.logtalk.ui.chat.ChatViewModelFactory
 import com.example.logtalk.ui.chat.data.Message
 import com.example.logtalk.ui.chat.screen.ChatScreen
+import com.example.logtalk.ui.chat.viewmodel.ChatViewModel
 import com.example.logtalk.ui.navigation.MainScreenRoutes
 
 import com.example.logtalk.ui.settings.SettingsScreen
@@ -52,7 +56,6 @@ fun MainScreen() {
     // 하단 탭 설정
     val items = listOf(
         MainScreenRoutes.Home,
-        MainScreenRoutes.Chat,
         MainScreenRoutes.Settings,
     )
 
@@ -129,13 +132,57 @@ fun MainScreen() {
 
         ) {
 
-            composable(MainScreenRoutes.Home.route) { HomeScreen() }
-            composable(MainScreenRoutes.Chat.route) { ChatScreen(
-                onBackClick = {
-                    mainNavController.popBackStack() // 이 코드가 HomeScreen으로 돌아가게 함
-                },
-                viewModel = viewModel()
-            )
+            composable(MainScreenRoutes.Home.route) {
+                HomeScreen( /*
+                    onChatSelected = { titleId ->
+                        mainNavController.navigate("chat/$titleId")
+                    },
+                    onNewChatClicked = {
+                        mainNavController.navigate("chat/-1")
+                    }*/ //라우팅 추가로 연결해야함
+                )
+            }
+
+            //chat route
+            composable(
+                route = MainScreenRoutes.Chat.route, // "chat/{titleId}" 경로가 되도록 가정
+                arguments = listOf(navArgument("titleId") {
+                    type = NavType.LongType
+                    defaultValue = -1L // 값이 없으면 -1L (새 채팅)
+                })
+            ) { backStackEntry ->
+                // 2.1. Navigation 인수 추출
+                val initialTitleId = backStackEntry.arguments?.getLong("titleId") ?: -1L
+
+                // 2.2. ViewModel Factory를 사용하여 ViewModel 인스턴스 생성 및 파라미터 주입
+                // 🚨 주의: 아래 Use Case 인스턴스는 실제 앱의 DI 컨테이너에서 가져와야 합니다.
+                // 여기서는 주입이 가능하다는 가정 하에 코드를 완성합니다.
+                val chatViewModel: ChatViewModel = viewModel(
+                    // NOTE: 아래 코드는 Factory와 모든 Use Case 인스턴스가 사용 가능해야 합니다.
+                    factory = ChatViewModelFactory(
+                        initialTitleId = initialTitleId,
+
+                        createNewChatUseCase = createNewChatUseCaseInstance,
+                        getChatHistoryUseCase = getChatHistoryUseCaseInstance,
+                        sendMessageUseCase = sendMessageUseCaseInstance,
+                        deleteChatUseCase = deleteChatUseCaseInstance,
+                        generateAndSaveTitleUseCase = generateAndSaveTitleUseCaseInstance
+                    )
+                )
+
+                // 2.3. ChatScreen 호출 및 모든 콜백 연결
+                ChatScreen(
+                    onBackClick = {
+                        mainNavController.popBackStack() // HomeScreen으로 돌아가기
+                    },
+                    // TODO: 유사 상담 화면으로 이동하는 Navigation 로직 연결
+                    onNavigateToSimilarConsultation = {
+                        // mainNavController.navigate("similar_consultation_route")
+                        // 임시로 뒤로가기 대신 로그를 남김
+                        println("DEBUG: Navigate to Similar Consultation")
+                    },
+                    viewModel = chatViewModel
+                )
             }
             //여기서 viewmodel 라우팅 해줘야돼요!!!!!! 꼭 하자 OK?
             composable(MainScreenRoutes.Settings.route) {
