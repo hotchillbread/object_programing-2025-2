@@ -149,7 +149,7 @@ fun ChatContent(messages: List<Message>, modifier: Modifier = Modifier) {
         state = listState,
         reverseLayout = false // 가장 아래로 스크롤하는 방식이므로 reverseLayout = false 유지
     ) {
-        items(messages, key = { it.id }) { message ->
+        items(messages, key = { it.id.toString() + it.text }) { message ->
             MessageBubble(message = message)
         }
     }
@@ -157,7 +157,7 @@ fun ChatContent(messages: List<Message>, modifier: Modifier = Modifier) {
 
 @Composable
 fun MessageBubble(message: Message) {
-    // TODO: (추가 기능) 봇 메시지(isUser=false)를 길게 클릭 시 '신고하기' 등의 컨텍스트 메뉴 표시 로직 구현
+    //여기는 단일 컴포넌트 블럭이라 문제없음
 
     val bubbleShape = if (message.isUser) {
         RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp, bottomStart = 12.dp, bottomEnd = 0.dp)

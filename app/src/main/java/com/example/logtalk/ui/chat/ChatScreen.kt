@@ -39,7 +39,6 @@ public fun ChatScreen(
                 },
                 onReportClick = viewModel::reportChat, // 신고 기능
                 onDeleteChatClick = {
-                    // ✨ 문제 해결: 람다 함수를 전달하고, 삭제 성공 시 onBackClick을 호출하여 화면을 닫음
                     viewModel.deleteChat(onChatDeleted = onBackClick)
                 }
             )

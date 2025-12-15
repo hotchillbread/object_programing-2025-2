@@ -1,3 +1,5 @@
+package com.example.logtalk.domain.chat
+
 import com.example.logtalk.ui.chat.data.Message
 import com.example.logtalk.ui.chat.data.Title
 import kotlinx.coroutines.flow.Flow
@@ -8,7 +10,7 @@ interface ChatRepository {
     suspend fun resetHistory() // LLM 초기화
 
     // 메시지
-    suspend fun saveMessage(message: Message, parentTitleId: Long)
+    suspend fun saveMessage(message: Message, parentTitleId: Long): Message
     fun getMessagesByParentTitleId(parentTitleId: Long): Flow<List<Message>>
 
     // 채팅방

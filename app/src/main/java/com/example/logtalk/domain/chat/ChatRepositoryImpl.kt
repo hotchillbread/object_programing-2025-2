@@ -1,3 +1,5 @@
+package com.example.logtalk.domain.chat
+
 import com.example.logtalk.core.utils.model.OpenAILLMChatService
 import com.example.logtalk.data.local.MessageData
 import com.example.logtalk.data.local.TitleData
@@ -7,8 +9,10 @@ import com.example.logtalk.ui.chat.data.Message
 import com.example.logtalk.ui.chat.data.Title
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import com.example.logtalk.domain.chat.ChatRepository
+import javax.inject.Inject
 
-class ChatRepositoryImpl(
+class ChatRepositoryImpl @Inject constructor(
     private val messageDao: MessageDao,
     private val titleDao: TitleDao,
     private val llmService: OpenAILLMChatService,
@@ -24,9 +28,12 @@ class ChatRepositoryImpl(
     }
 
     //메세지
-    override suspend fun saveMessage(message: Message, parentTitleId: Long) {
+    override suspend fun saveMessage(message: Message, parentTitleId: Long): Message {
         val entity = message.toEntity(parentTitleId)
-        messageDao.insertMessage(entity)
+
+        val newId = messageDao.insertMessage(entity)
+
+        return message.copy(id = newId)
     }
 
     override fun getMessagesByParentTitleId(parentTitleId: Long): Flow<List<Message>> {
@@ -56,7 +63,7 @@ class ChatRepositoryImpl(
     }
 
     override suspend fun updateTitleText(titleId: Long, newTitle: String) {
-        titleDao.updateTitleText(titleId, newTitle)
+        return titleDao.updateTitleText(titleId, newTitle)
     }
 }
 
