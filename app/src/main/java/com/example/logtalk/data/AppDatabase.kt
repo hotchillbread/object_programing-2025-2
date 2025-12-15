@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.example.logtalk.core.utils.Logger
+import com.example.logtalk.data.local.Converters
 import com.example.logtalk.data.local.MessageDao
 import com.example.logtalk.data.local.MessageData
 import com.example.logtalk.data.local.TitleData
@@ -17,6 +19,7 @@ import com.example.logtalk.data.local.UserProfile
     version = 1,
     exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     //Dao 정의
     abstract fun userDao(): UserDao

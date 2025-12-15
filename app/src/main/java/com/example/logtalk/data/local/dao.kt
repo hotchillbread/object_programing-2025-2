@@ -48,6 +48,9 @@ interface TitleDao {
     @Query("SELECT * FROM title ORDER BY createdAt DESC")
     fun getAllTitles(): Flow<List<TitleData>>
 
+    @Query("SELECT * FROM title WHERE titleId = :titleId")
+    suspend fun getTitleById(titleId: Long): TitleData?
+
     //채팅방 삭제 (ForeignKey.CASCADE로 MessageData도 같이 삭제됨)
     @Delete
     suspend fun deleteTitle(title: TitleData)

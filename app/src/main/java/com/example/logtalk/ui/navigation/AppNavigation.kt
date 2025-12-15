@@ -4,10 +4,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.logtalk.ui.login.LoginScreen
 import com.example.logtalk.MainScreen
 import com.example.logtalk.ui.relatedChat.RelatedChatScreen
@@ -51,8 +53,15 @@ fun AppNavigation() {
             composable("main_screen") {
                 MainScreen(rootNavController = rootNavController) // Pass NavController to MainScreen
             }
-            composable(MainScreenRoutes.RelatedChat.route) {
-                RelatedChatScreen(onBackClick = { rootNavController.popBackStack() })
+            composable(
+                route = MainScreenRoutes.RelatedChat.route + "/{sessionId}",
+                arguments = listOf(navArgument("sessionId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val sessionId = backStackEntry.arguments?.getLong("sessionId") ?: -1L
+                RelatedChatScreen(
+                    onBackClick = { rootNavController.popBackStack() },
+                    sessionId = sessionId
+                )
             }
         }
     }

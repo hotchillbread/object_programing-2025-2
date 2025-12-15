@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -15,15 +16,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.logtalk.ui.chat.composable.LogTalkAppBar
 
 @Composable
 fun RelatedChatScreen(
     onBackClick: () -> Unit,
-    viewModel: RelatedChatViewModel = viewModel()
+    sessionId: Long,
+    viewModel: RelatedChatViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(sessionId) {
+        viewModel.fetchRelatedChats(sessionId)
+    }
 
     Scaffold(
         topBar = {
@@ -81,9 +87,3 @@ fun RelatedChatItem(chat: RelatedChat) {
         }
     }
 }
-
-data class RelatedChat(
-    val date: String,
-    val title: String,
-    val summary: String
-)

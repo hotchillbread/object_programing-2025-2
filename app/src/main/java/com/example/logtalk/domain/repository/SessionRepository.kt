@@ -22,21 +22,12 @@ interface SessionRepository {
      * 세션 ID로 조회
      */
     suspend fun getSessionById(id: Long): Session?
-
-    /**
-     * 새 세션 생성
-     * @return 생성된 세션의 ID
-     */
+    
     suspend fun createSession(): Long
 
-    /**
-     * 세션 삭제
-     */
+
     suspend fun deleteSession(id: Long)
 
-    /**
-     * 세션 관찰 (실시간 업데이트)
-     */
+
     fun observeSessions(): Flow<List<Session>>
 }
-

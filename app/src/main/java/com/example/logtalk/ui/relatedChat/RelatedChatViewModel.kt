@@ -2,34 +2,35 @@ package com.example.logtalk.ui.relatedChat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.logtalk.domain.usecase.GetSimilarSessionsUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class RelatedChatViewModel : ViewModel() {
+@HiltViewModel
+class RelatedChatViewModel @Inject constructor(
+    private val getSimilarSessionsUseCase: GetSimilarSessionsUseCase
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RelatedChatState())
     val uiState: StateFlow<RelatedChatState> = _uiState
 
-    init {
-        fetchRelatedChats()
-    }
-
-    private fun fetchRelatedChats() {
+    fun fetchRelatedChats(sessionId: Long) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-            // In a real app, you would fetch this from a repository or use case
-            val chats = getDummyRelatedChats()
-            _uiState.value = _uiState.value.copy(isLoading = false, relatedChats = chats)
+            val similarSessions = getSimilarSessionsUseCase(sessionId)
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                relatedChats = similarSessions.map {
+                    RelatedChat(
+                        date = "", // You need to format the date
+                        title = it.title,
+                        summary = it.lastMessage ?: ""
+                    )
+                }
+            )
         }
-    }
-
-    private fun getDummyRelatedChats(): List<RelatedChat> {
-        return listOf(
-            RelatedChat("2025.11.02", "너 생각에는 내가 재수강을 하는게 좋을까?", "아 그래? 넌 왜 그렇게 생각해? 3줄로 말해"),
-            RelatedChat("2025.11.02", "너 생각에는 내가 재수강을 하는게 좋을까?", "아 그래? 넌 왜 그렇게 생각해? 3줄로 말해"),
-            RelatedChat("2025.11.02", "너 생각에는 내가 재수강을 하는게 좋을까?", "아 그래? 넌 왜 그렇게 생각해? 3줄로 말해"),
-            RelatedChat("2025.11.02", "너 생각에는 내가 재수강을 하는게 좋을까?", "아 그래? 넌 왜 그렇게 생각해? 3줄로 말해")
-        )
     }
 }

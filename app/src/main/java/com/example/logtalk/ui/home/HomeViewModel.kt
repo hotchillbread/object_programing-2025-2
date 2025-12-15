@@ -1,6 +1,8 @@
 // 상태/이벤트/로직
 package com.example.logtalk.ui.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.logtalk.domain.usecase.CreateSessionUseCase
@@ -17,6 +19,7 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import javax.inject.Inject
 
+@RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getRecentSessions: GetRecentSessionsUseCase,
@@ -44,12 +47,14 @@ class HomeViewModel @Inject constructor(
         intents.tryEmit(intent)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun loadInitial() = viewModelScope.launch {
         _uiState.value = HomeUiState.Loading
         val sessions = getRecentSessions()
         renderList(sessions)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun observeIntents() = viewModelScope.launch {
         intents.collect { intent ->
             when (intent) {
@@ -61,6 +66,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun onSearchChanged(query: String) = viewModelScope.launch {
         // 필요 시 debounce는 Fragment/TextWatcher 측에서 처리
         val sessions = if (query.isBlank()) getRecentSessions() else searchSessions(query)
@@ -72,6 +78,7 @@ class HomeViewModel @Inject constructor(
         _navEvents.send(NavEvent.ToChat(newId))
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun renderList(domainList: List<com.example.logtalk.domain.model.Session>) {
         if (domainList.isEmpty()) {
             _uiState.value = HomeUiState.Empty
