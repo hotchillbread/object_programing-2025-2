@@ -1,6 +1,5 @@
-package com.example.logtalk.domain.usecase
+package com.example.logtalk.domain.chat
 
-import com.example.logtalk.domain.chat.ChatRepository
 import com.example.logtalk.ui.chat.data.Message
 
 class ChatUseCase(

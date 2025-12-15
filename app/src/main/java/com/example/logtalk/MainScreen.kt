@@ -22,7 +22,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
@@ -35,6 +35,7 @@ import com.example.logtalk.ui.settings.SettingsScreen
 import com.example.logtalk.ui.theme.LoginColors
 import com.example.logtalk.ui.home.HomeScreen
 import com.example.logtalk.ui.groomy.GroomyScreen
+import com.example.logtalk.ui.insight.InsightScreen
 
 @Composable
 fun MainScreen() {
@@ -135,16 +136,19 @@ fun MainScreen() {
                 HomeScreen(
                     onGroomyClick = {
                         mainNavController.navigate(OtherScreenRoutes.GROOMY)
+                    },
+                    onInsightClick = {
+                        mainNavController.navigate(OtherScreenRoutes.INSIGHT)
                     }
                 )
             }
-            composable(MainScreenRoutes.Chat.route) { ChatScreen(
-                onBackClick = {
-                    mainNavController.popBackStack() // 이 코드가 HomeScreen으로 돌아가게 함
-                },
-                viewModel = viewModel()
-            )
-            }
+        composable(MainScreenRoutes.Chat.route) { ChatScreen(
+            onBackClick = {
+                mainNavController.popBackStack() // 이 코드가 HomeScreen으로 돌아가게 함
+            },
+            viewModel = hiltViewModel()
+        )
+        }
             //여기서 viewmodel 라우팅 해줘야돼요!!!!!! 꼭 하자 OK?
             composable(MainScreenRoutes.Settings.route) {
                 SettingsScreen(
@@ -155,6 +159,13 @@ fun MainScreen() {
             }
             composable(OtherScreenRoutes.GROOMY) {
                 GroomyScreen(
+                    onBackClick = {
+                        mainNavController.popBackStack() // HomeScreen으로 돌아가기
+                    }
+                )
+            }
+            composable(OtherScreenRoutes.INSIGHT) {
+                InsightScreen(
                     onBackClick = {
                         mainNavController.popBackStack() // HomeScreen으로 돌아가기
                     }

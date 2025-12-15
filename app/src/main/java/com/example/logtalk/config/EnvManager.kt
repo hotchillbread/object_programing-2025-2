@@ -1,5 +1,6 @@
 package com.example.logtalk.config
 
+import androidx.compose.foundation.layout.Box
 import com.example.logtalk.BuildConfig
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
@@ -41,6 +42,6 @@ object EnvManager {
 
     // api key가져오기
     fun getOpenaiApiKey(): String {
-        return remoteConfig.getString("openai_api_key_url")
+        return BuildConfig.OPENAI_API_KEY
     }
 }

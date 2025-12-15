@@ -5,12 +5,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.logtalk.domain.chat.ChatUseCase
 import com.example.logtalk.ui.chat.data.ChatUiState
-import com.example.logtalk.ui.chat.data.Message
-import kotlinx.coroutines.delay // 임시 딜레이를 위해 사용
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ChatViewModel : ViewModel() {
+@HiltViewModel
+class ChatViewModel @Inject constructor(
+    private val chatUseCase: ChatUseCase
+) : ViewModel() {
 
     //UI 상태
     var uiState by mutableStateOf(ChatUiState())
@@ -28,35 +32,29 @@ class ChatViewModel : ViewModel() {
         val userMessageText = uiState.textInput
         updateTextInput("") // 입력 필드 초기화
 
-        //사용자 메시지를 목록에 추가
-        val userMessage = Message(
-            id = System.currentTimeMillis(), // 임시값
-            text = userMessageText,
-            isUser = true
-        )
-        val newMessages = uiState.messages + userMessage
-        uiState = uiState.copy(
-            messages = newMessages,
-            isLoading = true
-        )
+        // 로딩 상태 표시
+        uiState = uiState.copy(isLoading = true)
 
-        /*봇 응답, 목록에 추가
         viewModelScope.launch {
-            // TODO: 실제로는 서버 API 호출 또는 로컬 LLM 추론 로직 구현
+            try {
+                // ChatUseCase를 통해 사용자 메시지 전송 및 봇 응답 받기
+                val updatedMessages = chatUseCase.getBotResponseWithMessageUpdate(
+                    userMessageText = userMessageText,
+                    currentMessages = uiState.messages
+                )
 
-            val botResponse = generateBotResponse(userMessageText)
-            val botMessage = Message(
-                id = System.currentTimeMillis() + 1, // 임시 ID
-                text = botResponse,
-                isUser = false,
-            )
-
-            uiState = uiState.copy(
-                messages = uiState.messages + botMessage,
-                isLoading = false
-            )
-            // TODO: 메시지 스크롤을 가장 아래로 이동시키는 로직 구현 (Compose LazyListState 사용)
-        } */
+                uiState = uiState.copy(
+                    messages = updatedMessages,
+                    isLoading = false
+                )
+            } catch (e: Exception) {
+                // 에러 발생 시 처리
+                uiState = uiState.copy(
+                    isLoading = false
+                )
+                // TODO: 에러 메시지를 UI에 표시
+            }
+        }
     }
 
     // TODO: 음성 메시지 전송 로직 구현 (후순위)
@@ -69,14 +67,30 @@ class ChatViewModel : ViewModel() {
         // 홈 화면 또는 별도의 검색 화면으로 이동/API 호출 로직 구현
     }
 
-    // TODO: 채팅 신고 로직 구현 (후순위)
+    // 채팅 신고 로직
     fun reportChat() {
-        // 신고 호출 로직 구현
+        viewModelScope.launch {
+            try {
+                chatUseCase.reportChat()
+                // TODO: 신고 완료 메시지 표시
+            } catch (e: Exception) {
+                // TODO: 에러 처리
+            }
+        }
     }
 
-    // TODO: 채팅 삭제 로직 구현
+    // 채팅 삭제 로직
     fun deleteChat() {
-        // 채팅 기록 삭제 API 호출 및 UI 업데이트 로직 구현
+        viewModelScope.launch {
+            try {
+                chatUseCase.deleteChat()
+                // 채팅 기록 초기화
+                uiState = uiState.copy(messages = emptyList())
+                // TODO: 삭제 완료 메시지 표시
+            } catch (e: Exception) {
+                // TODO: 에러 처리
+            }
+        }
     }
-    // TODO: 뒤로 가기
 }
+

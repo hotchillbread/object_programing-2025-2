@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.google.dagger.hilt.android")
     alias(libs.plugins.android.application)
@@ -9,6 +11,13 @@ plugins {
     //firebase
     id("com.google.gms.google-services")
 }
+
+// local.properties에서 비밀키 로드
+val localProps = Properties().apply {
+    val file = project.rootProject.file("local.properties")
+    if (file.exists()) load(file.inputStream())
+}
+val openaiApiKey: String = localProps.getProperty("openaiApiKey") ?: ""
 
 android {
     namespace = "com.example.logtalk"
@@ -22,6 +31,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // 모든 빌드 타입에서 접근 가능한 BuildConfig 필드로 노출
+        buildConfigField("String", "OPENAI_API_KEY", "\"${openaiApiKey}\"")
     }
 
     buildTypes {
@@ -31,6 +43,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            // debug 전용 추가 설정이 필요하면 여기에 배치
         }
     }
     compileOptions {
@@ -45,10 +60,12 @@ android {
         compose = true
         viewBinding = true
         dataBinding = true
+
     }
 }
 
 dependencies {
+
     // 기본 compose, android 의존성 패키지
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -91,6 +108,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.okhttp3.logging.interceptor)
 
+
     // 테스트 의존성
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -108,5 +126,10 @@ dependencies {
 
     //openai
     implementation(libs.openai.client)
-    //implementation("com.squareup.okio:okio:3.9.0")
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.client.auth)
 }
