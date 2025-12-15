@@ -29,7 +29,6 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
-import com.example.logtalk.ui.chat.data.Message
 import com.example.logtalk.ui.chat.screen.ChatScreen
 import com.example.logtalk.ui.chat.viewmodel.ChatViewModel
 import com.example.logtalk.ui.navigation.MainScreenRoutes
@@ -138,20 +137,26 @@ fun MainScreen() {
                 HomeScreen(
                     onGroomyClick = {
                         mainNavController.navigate(OtherScreenRoutes.GROOMY)
+                    },
+                    onSessionClick = { sessionId ->
+                        // 기존 세션 클릭 시 해당 채팅방으로 이동
+                        mainNavController.navigate("${MainScreenRoutes.Chat.route}/$sessionId")
+                    },
+                    onNewChatClick = {
+                        // 새 채팅 시작 시 titleId = -1로 이동 (새 세션 생성)
+                        mainNavController.navigate("${MainScreenRoutes.Chat.route}/-1")
                     }
                 )
             }
 
             //chat route
             composable(
-                route = MainScreenRoutes.Chat.route, // "chat/{titleId}" 경로
+                route = "${MainScreenRoutes.Chat.route}/{titleId}", // "chat/{titleId}" 경로
                 arguments = listOf(navArgument("titleId") {
                     type = NavType.LongType
-                    defaultValue = -1L //
+                    defaultValue = -1L
                 })
             ) { backStackEntry ->
-                //
-                val initialTitleId = backStackEntry.arguments?.getLong("titleId") ?: -1L
 
                 val chatViewModel = hiltViewModel<ChatViewModel>(backStackEntry)
 

@@ -12,10 +12,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun GroomyScreen(onBackClick: () -> Unit) {
-    var progressLevel by remember { mutableStateOf(3) } // 1~5 사이 값
+fun GroomyScreen(
+    onBackClick: () -> Unit,
+    viewModel: GroomyViewModel = hiltViewModel()
+) {
+    val totalMessageCount by viewModel.totalMessageCount.collectAsState()
+    val progressLevel by viewModel.progressLevel.collectAsState()
+    val emotionMessage by viewModel.emotionMessage.collectAsState()
 
     Column(
         modifier = Modifier
@@ -56,42 +62,26 @@ fun GroomyScreen(onBackClick: () -> Unit) {
 
             Spacer(modifier = Modifier.height(60.dp))
 
-            // 구름 이미지와 프로그레스 바
-            ProgressBarWithCloud(progressLevel = progressLevel)
+            // 구름 이미지와 프로그레스 바 (채팅 횟수 기반)
+            ProgressBarWithCloud(chatCount = totalMessageCount)
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // 진행 레벨 조절 버튼들 (테스트용)
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                (1..5).forEach { level ->
-                    Button(
-                        onClick = { progressLevel = level },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (progressLevel == level)
-                                Color(0xFF6282E1) else Color.LightGray
-                        )
-                    ) {
-                        Text("$level")
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
+            // 감정 상태 메시지
             Text(
-                text = when (progressLevel) {
-                    1 -> "많이 힘드시네요..."
-                    2 -> "조금 힘든 상태예요"
-                    3 -> "보통이에요"
-                    4 -> "기분이 좋네요!"
-                    5 -> "최고의 기분이에요!"
-                    else -> ""
-                },
+                text = emotionMessage,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color(0xFF6282E1)
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // 프로그레스 레벨 표시 (디버그용)
+            Text(
+                text = "레벨: $progressLevel / 5",
+                fontSize = 14.sp,
+                color = Color.Gray
             )
         }
     }

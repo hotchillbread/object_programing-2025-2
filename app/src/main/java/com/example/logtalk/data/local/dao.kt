@@ -3,11 +3,8 @@ package com.example.logtalk.data.local
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Insert
-import androidx.room.Update
 import androidx.room.Delete
 import androidx.room.OnConflictStrategy
-import com.example.logtalk.data.local.MessageData
-import com.example.logtalk.data.local.TitleData
 import kotlinx.coroutines.flow.Flow
 
 
@@ -35,6 +32,10 @@ interface MessageDao {
     //메세지 몇개인지 기록 수 가져오기 근데 이거 왜만들었지...
     @Query("SELECT COUNT(messageId) FROM messages WHERE parentTitleId = :parentTitleId")
     suspend fun getMessageCount(parentTitleId: Long): Int
+
+    //전체 메시지 개수 가져오기 (Groomy용)
+    @Query("SELECT COUNT(*) FROM messages")
+    fun getTotalMessageCount(): Flow<Int>
 }
 
 @Dao

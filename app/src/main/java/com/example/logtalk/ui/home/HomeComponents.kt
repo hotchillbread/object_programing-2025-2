@@ -135,9 +135,10 @@ fun ChatGPTIconWithGradient(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun SearchBar() {
-    var searchText by remember { mutableStateOf("") }
-
+fun SearchBar(
+    query: String = "",
+    onQueryChange: (String) -> Unit = {}
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -173,7 +174,7 @@ fun SearchBar() {
                     modifier = Modifier.weight(1f),
                     contentAlignment = Alignment.CenterStart
                 ) {
-                    if (searchText.isEmpty()) {
+                    if (query.isEmpty()) {
                         Text(
                             text = "상담 기록 검색...",
                             color = Color.Gray,
@@ -181,8 +182,8 @@ fun SearchBar() {
                         )
                     }
                     androidx.compose.foundation.text.BasicTextField(
-                        value = searchText,
-                        onValueChange = { searchText = it },
+                        value = query,
+                        onValueChange = onQueryChange,
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = androidx.compose.ui.text.TextStyle(
                             fontSize = 14.sp,
@@ -194,26 +195,50 @@ fun SearchBar() {
                         }
                     )
                 }
+
+                // Clear 버튼 (검색어가 있을 때만 표시)
+                if (query.isNotEmpty()) {
+                    IconButton(
+                        onClick = { onQueryChange("") },
+                        modifier = Modifier.size(20.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "검색어 지우기",
+                            tint = Color.Gray,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun SessionList(sessions: List<SessionData>) {
+fun SessionList(
+    sessions: List<SessionData>,
+    onSessionClick: (Long) -> Unit = {}
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 80.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(sessions.size) { index ->
-            SessionCard(session = sessions[index])
+            SessionCard(
+                session = sessions[index],
+                onClick = { onSessionClick(sessions[index].id) }
+            )
         }
     }
 }
 
 @Composable
-fun SessionCard(session: SessionData) {
+fun SessionCard(
+    session: SessionData,
+    onClick: () -> Unit = {}
+) {
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
@@ -229,7 +254,7 @@ fun SessionCard(session: SessionData) {
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clickable { /* TODO: 세션 열기 */ }
+                    .clickable(onClick = onClick)
                     .padding(horizontal = 16.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -270,7 +295,9 @@ fun SessionCard(session: SessionData) {
 }
 
 @Composable
-fun EmptyState() {
+fun EmptyState(searchQuery: String = "") {
+    val isSearching = searchQuery.isNotEmpty()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -286,7 +313,7 @@ fun EmptyState() {
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = Icons.Default.AddComment,
+                imageVector = if (isSearching) Icons.Default.SearchOff else Icons.Default.AddComment,
                 contentDescription = null,
                 tint = Color.Gray,
                 modifier = Modifier.size(60.dp)
@@ -296,7 +323,7 @@ fun EmptyState() {
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "아직 상담 기록이 없습니다",
+            text = if (isSearching) "검색 결과가 없습니다" else "아직 상담 기록이 없습니다",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black
@@ -305,7 +332,7 @@ fun EmptyState() {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "새로운 상담을 시작해보세요",
+            text = if (isSearching) "다른 키워드로 검색해보세요" else "새로운 상담을 시작해보세요",
             fontSize = 14.sp,
             color = Color.Gray
         )
