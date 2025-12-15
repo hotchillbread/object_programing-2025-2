@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.google.dagger.hilt.android")
     alias(libs.plugins.android.application)
@@ -31,6 +33,18 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        buildTypes {
+            debug {
+                val properties = Properties()
+                properties.load(project.rootProject.file("local.properties").inputStream())
+
+                this.buildConfigField(
+                    "String",
+                    "OPENAI_API_KEY",
+                    properties.getProperty("openaiApiKey") ?: "\"\""
+                )
+            }
         }
     }
     compileOptions {
