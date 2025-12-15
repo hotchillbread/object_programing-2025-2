@@ -14,7 +14,6 @@ interface OpenaiLLM {
     suspend fun getResponse(prompt: String): String
 }
 
-
 //기본 쳇봇
 class OpenAILLMChatService(
     private val apiKey: String,

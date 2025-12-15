@@ -10,11 +10,13 @@ import com.example.logtalk.data.local.Converters
 import com.example.logtalk.data.local.MessageDao
 import com.example.logtalk.data.local.MessageData
 import com.example.logtalk.data.local.TitleData
+import com.example.logtalk.data.local.Title
 import com.example.logtalk.data.local.TitleDao
 import com.example.logtalk.data.local.UserDao
 import com.example.logtalk.data.local.UserProfile
 
 @Database(
+    entities = [Title::class, MessageData::class, UserProfile::class],
     entities = [TitleData::class, MessageData::class, UserProfile::class],
     version = 1,
     exportSchema = false

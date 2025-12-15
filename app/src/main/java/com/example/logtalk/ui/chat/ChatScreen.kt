@@ -10,6 +10,7 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.logtalk.ui.chat.composable.ChatContent
@@ -18,8 +19,10 @@ import com.example.logtalk.ui.chat.composable.MessageInput
 import com.example.logtalk.ui.chat.viewmodel.ChatViewModel
 import com.example.logtalk.ui.theme.ChatColors // 가정된 색상
 
+
 @Composable
 public fun ChatScreen(
+    // TODO: NavController 또는 Navigation 콜백을 위한 파라미터 추가
     onBackClick: () -> Unit,
     onNavigateToSimilarConsultation: () -> Unit, // TODO: 유사 상담 화면으로 이동 콜백 추가
 
@@ -37,9 +40,15 @@ public fun ChatScreen(
                     viewModel.findSimilarConsultation()
                     onNavigateToSimilarConsultation() // 실제 화면 이동 실행
                 },
+                onReportClick = {
+                    // TODO: 신고 기능 로직 구현 (후순위)
+                    viewModel.reportChat()
+                },
                 onReportClick = viewModel::reportChat, // 신고 기능
                 onDeleteChatClick = {
                     viewModel.deleteChat(onChatDeleted = onBackClick)
+                    // TODO: 대화 삭제 기능 로직 구현 (
+                    viewModel.deleteChat()
                 }
             )
         },

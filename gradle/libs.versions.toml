@@ -38,6 +38,7 @@ firebaseBom = "32.7.0"
 openai = "4.0.1"
 ktor = "3.0.0"
 
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }

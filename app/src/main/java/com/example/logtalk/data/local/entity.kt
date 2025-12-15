@@ -41,6 +41,7 @@ data class TitleData(
     foreignKeys = [
         ForeignKey(
             entity = TitleData::class,
+            entity = Title::class,
             parentColumns = ["titleId"], // 부모 테이블의 컬럼
             childColumns = ["parentTitleId"], // 자식 테이블의 컬럼
             onDelete = ForeignKey.CASCADE // 부모가 삭제되면 자식도 삭제 (종속성 확보)

@@ -34,6 +34,7 @@ import com.example.logtalk.ui.chat.data.Message
 import com.example.logtalk.ui.chat.screen.ChatScreen
 import com.example.logtalk.ui.chat.viewmodel.ChatViewModel
 import com.example.logtalk.ui.navigation.MainScreenRoutes
+import com.example.logtalk.ui.navigation.OtherScreenRoutes
 
 import com.example.logtalk.ui.settings.SettingsScreen
 import com.example.logtalk.ui.theme.LoginColors

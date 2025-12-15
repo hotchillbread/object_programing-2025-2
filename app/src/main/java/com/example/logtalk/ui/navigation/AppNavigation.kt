@@ -11,6 +11,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.logtalk.ui.login.LoginScreen
+import com.example.logtalk.MainScreen // 방금 만든 MainScreen 임포트
 import com.example.logtalk.MainScreen
 import com.example.logtalk.ui.relatedChat.RelatedChatScreen
 
@@ -28,27 +29,34 @@ fun AppNavigation() {
             startDestination = AuthScreenRoutes.LOGIN
         ) {
             composable(AuthScreenRoutes.LOGIN) {
+                // Login
                 LoginScreen(
                     onGoogleLoginClick = {
+                        // 로그인 성공으로 임시 저장(나중에 로직 추가)
                         rootNavController.navigate(AppGraph.MAIN) {
+                            // 인증 제거
                             popUpTo(AppGraph.AUTHENTICATION) {
                                 inclusive = true
                             }
                         }
                     },
+                    //회원가입 시
                     onSignUpClick = {
                         rootNavController.navigate(AuthScreenRoutes.ONBOARDING)
+                        //하단에 온보딩으로 보내는 로직 작성
                     }
                 )
             }
             composable(AuthScreenRoutes.ONBOARDING) {
+                //OnboardingScreen()을 호출 필요
                 Text("온보딩 화면", modifier = Modifier.fillMaxSize())
             }
         }
 
+        // 메인
         navigation(
             route = AppGraph.MAIN,
-            startDestination = "main_screen"
+            startDestination =  "main_screen"
         ) {
             composable("main_screen") {
                 MainScreen(rootNavController = rootNavController) // Pass NavController to MainScreen

@@ -130,6 +130,9 @@ fun LogTalkAppBar(onBackClick: () -> Unit,
     )
 }
 
+/**
+ * 채팅 목록을 표시하는 컴포저블
+ */
 @Composable
 fun ChatContent(messages: List<Message>, modifier: Modifier = Modifier) {
     val listState = rememberLazyListState()
@@ -157,7 +160,6 @@ fun ChatContent(messages: List<Message>, modifier: Modifier = Modifier) {
 
 @Composable
 fun MessageBubble(message: Message) {
-    //여기는 단일 컴포넌트 블럭이라 문제없음
 
     val bubbleShape = if (message.isUser) {
         RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp, bottomStart = 12.dp, bottomEnd = 0.dp)
