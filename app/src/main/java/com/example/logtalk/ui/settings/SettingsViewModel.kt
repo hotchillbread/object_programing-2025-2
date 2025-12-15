@@ -2,7 +2,6 @@ package com.example.logtalk.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.logtalk.core.utils.SystemPromptManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,61 +20,24 @@ interface DeleteAllRecordsUseCase { suspend fun executeDelete() }
 class SettingsViewModel @Inject constructor(
     private val savePersonaUseCase: SavePersonaUseCase,
     private val loadPersonaUseCase: LoadPersonaUseCase,
-    private val deleteAllRecordsUseCase: DeleteAllRecordsUseCase,
-    private val systemPromptManager: SystemPromptManager,
-    private val settingsRepository: com.example.logtalk.data.repositoryImpl.SettingsRepositoryImpl
+    private val deleteAllRecordsUseCase: DeleteAllRecordsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState
 
-
     init {
         loadInitialData()
-        observeSystemPromptChanges()
     }
 
     private fun loadInitialData() {
         viewModelScope.launch {
             // 초기 Persona Data 로드 시도
-            val loadedPersona = try { loadPersonaUseCase() } catch (_: Exception) { PersonaData() }
+            val loadedPersona = try { loadPersonaUseCase() } catch (e: Exception) { PersonaData() }
             _uiState.update {
                 it.copy(persona = loadedPersona, currentEditingPersona = loadedPersona)
             }
-            // SystemPromptManager에 저장된 프롬프트 반영
-            systemPromptManager.updateSystemPrompt(loadedPersona.description)
         }
-    }
-
-    /**
-     * SystemPromptManager의 변경사항을 구독하여 실시간 반영
-     */
-    private fun observeSystemPromptChanges() {
-        viewModelScope.launch {
-            systemPromptManager.systemPromptFlow.collect { newPrompt ->
-                // 프롬프트가 변경되면 DB에서 다시 로드
-                if (newPrompt.isNotBlank() && newPrompt != _uiState.value.persona.description) {
-                    val updatedPersona = try {
-                        loadPersonaUseCase()
-                    } catch (_: Exception) {
-                        PersonaData(description = newPrompt)
-                    }
-                    _uiState.update {
-                        it.copy(
-                            persona = updatedPersona,
-                            currentEditingPersona = updatedPersona
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * 데이터 새로고침 (키워드 선택 화면에서 돌아올 때 호출)
-     */
-    fun refreshData() {
-        loadInitialData()
     }
 
     fun sendIntent(intent: SettingsIntent) {
@@ -106,12 +68,6 @@ class SettingsViewModel @Inject constructor(
             // 데이터 저장
             is SettingsIntent.SavePersona -> {
                 savePersonaUseCase(intent.persona)
-
-                // 편집 모드에서 저장한 경우 키워드 정보 삭제 (키워드 기반이 아님)
-                settingsRepository.saveSelectedKeywords(emptySet())
-
-                // SystemPromptManager에 새 프롬프트 반영 (실시간 업데이트)
-                systemPromptManager.updateSystemPrompt(intent.persona.description)
                 _uiState.update {
                     it.copy(persona = intent.persona, isEditingPersona = false)
                 }

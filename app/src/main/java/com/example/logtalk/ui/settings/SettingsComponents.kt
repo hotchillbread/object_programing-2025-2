@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 // SettingCard 컴포저블 (AI 페르소나, 데이터 관리 카드)
 @Composable
@@ -22,8 +21,7 @@ fun SettingCard(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     showCancelButton: Boolean = false,
-    onCancel: (() -> Unit)? = null,
-    extraContent: (@Composable () -> Unit)? = null // 추가 컨텐츠
+    onCancel: (() -> Unit)? = null
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -57,31 +55,19 @@ fun SettingCard(
                 ) {
                     Button(
                         onClick = onClick,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp),
+                        modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text(
-                            text = buttonText,
-                            color = Color.White,
-                            fontSize = 15.sp
-                        )
+                        Text(buttonText, color = Color.White)
                     }
                     OutlinedButton(
                         onClick = onCancel,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(8.dp),
                         border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f))
                     ) {
-                        Text(
-                            text = "취소",
-                            color = Color.Black,
-                            fontSize = 15.sp
-                        )
+                        Text("취소", color = Color.Black)
                     }
                 }
             } else {
@@ -90,39 +76,22 @@ fun SettingCard(
                     // 흰색 버튼은 OutlinedButton으로 표시
                     OutlinedButton(
                         onClick = onClick,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp),
                         border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f))
                     ) {
-                        Text(
-                            text = buttonText,
-                            color = Color.Black,
-                            fontSize = 15.sp
-                        )
+                        Text(buttonText, color = Color.Black)
                     }
                 } else {
                     Button(
                         onClick = onClick,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text(
-                            text = buttonText,
-                            color = Color.White,
-                            fontSize = 15.sp
-                        )
+                        Text(buttonText, color = Color.White)
                     }
                 }
-            }
-
-            // 추가 컨텐츠 표시
-            if (extraContent != null) {
-                extraContent()
             }
         }
     }

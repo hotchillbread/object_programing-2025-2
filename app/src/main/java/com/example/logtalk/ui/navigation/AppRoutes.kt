@@ -36,5 +36,4 @@ object  AuthScreenRoutes {
 //기타 라우트
 object OtherScreenRoutes {
     const val GROOMY = "groomy"
-    const val KEYWORD_SELECTION = "keyword_selection"
 }

@@ -6,13 +6,6 @@ import com.aallam.openai.api.chat.ChatRole
 import com.aallam.openai.api.http.Timeout
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
-import com.example.logtalk.core.utils.Logger
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
 //인터페이스
@@ -20,14 +13,12 @@ interface OpenaiLLM {
     suspend fun getResponse(prompt: String): String
 }
 
-
 //기본 쳇봇
 class OpenAILLMChatService(
     private val apiKey: String,
-    private var systemPrompt: String,
+    private val systemPrompt: String,
     private val maxHistoryMessages: Int = 12 //디폴트 벨류 설정
 ): OpenaiLLM {
-    init { Logger.d("OpenAI Client Init - Received Key: $apiKey") }
     private val client = OpenAI(
         token = apiKey,
         timeout = Timeout(socket = 60.seconds)
@@ -42,7 +33,7 @@ class OpenAILLMChatService(
         resetHistory()
     }
 
-    fun resetHistory() {
+    public fun resetHistory() {
         chatHistory.clear()
         chatHistory.add(
             ChatMessage(
@@ -54,50 +45,20 @@ class OpenAILLMChatService(
         summaryMessage = null
     }
 
-    // 시스템 프롬프트를 런타임에 업데이트. 기본은 히스토리 유지 모드.
-    fun updateSystemPrompt(newPrompt: String, preserveHistory: Boolean = true) {
-        systemPrompt = newPrompt
-        if (chatHistory.isEmpty()) {
-            // 안전장치: 히스토리가 비어있으면 새 시스템 프롬프트 추가
-            chatHistory.add(ChatMessage(ChatRole.System, systemPrompt))
-            return
-        }
-        if (preserveHistory) {
-            // 첫 메시지가 시스템이면 내용을 교체하여 UI에 노출 없이 즉시 반영
-            val first = chatHistory.first()
-            if (first.role == ChatRole.System) {
-                chatHistory[0] = ChatMessage(ChatRole.System, systemPrompt)
-            } else {
-                // 예상치 못한 상태: 앞에 사용자/어시스턴트가 있을 경우 맨 앞에 시스템 프롬프트 삽입
-                chatHistory.add(0, ChatMessage(ChatRole.System, systemPrompt))
-            }
-            // 요약 메시지는 유지되며 다음 요청부터 그대로 활용
-        } else {
-            // 히스토리 초기화 모드: 새 시스템 프롬프트로 히스토리를 재설정
-            resetHistory()
-        }
-    }
-
     private suspend fun eliminateHistory() {
         if (chatHistory.size > maxHistoryMessages) {
-            // 시스템 프롬프트는 항상 첫 번째 메시지
-            val systemPromptMessage = chatHistory.first()
-
-            // 시스템 프롬프트와 기존 요약 메시지를 제외한 실제 대화 내역만 추출
-            val startIndex = if (summaryMessage != null) 2 else 1
-            val messagesToSummarize = chatHistory.drop(startIndex)
+            //시스템 프롬프트 제외한 메세지 내역 추출
+            val messagesToSummarize = chatHistory.drop(1)
 
             val summaryText = summaryMessages(messagesToSummarize)
 
-            //이전 대화 요약을 위한 변수 값 할당 (누적 요약)
+            //이전 대화 요약을 위한 변수 값 할당
             summaryMessage = ChatMessage(
                 role = ChatRole.System,
-                content = "Previous conversation summary:\n${summaryMessage?.content ?: ""}\nRecent messages summary:\n$summaryText"
+                content = "Previous summary:\n${summaryMessage?.content ?: ""}\nNew summary:\n$summaryText"
             )
 
-            // 히스토리 재구성: 시스템 프롬프트 + 요약 메시지만 유지
-            chatHistory.clear()
-            chatHistory.add(systemPromptMessage)
+            chatHistory.retainAll(listOf(chatHistory.first()))
             summaryMessage?.let { chatHistory.add(it) }
         }
     }
@@ -149,28 +110,6 @@ class OpenAILLMChatService(
 
         return assistantContent
     }
-
-    // 설정 프롬프트 변경을 실시간 반영하기 위한 구독 관리
-    private var settingsScope: CoroutineScope? = null
-    private var promptCollectJob: Job? = null
-
-    // Settings 등에서 제공하는 Flow<String> (새 시스템 프롬프트)를 붙여 실시간 반영
-    fun attachSystemPromptFlow(promptFlow: Flow<String>, preserveHistory: Boolean = true) {
-        // 기존 구독 해제
-        promptCollectJob?.cancel()
-        if (settingsScope == null) settingsScope = CoroutineScope(Dispatchers.Default)
-        promptCollectJob = settingsScope!!.launch {
-            promptFlow.collectLatest { newPrompt ->
-                updateSystemPrompt(newPrompt, preserveHistory)
-            }
-        }
-    }
-
-    // 구독 해제 (필요 시 화면 파괴 등에서 호출)
-    fun detachSystemPromptFlow() {
-        promptCollectJob?.cancel()
-        promptCollectJob = null
-    }
 }
 
 class OpenIllegitimateSummarize(private val apiKey: String, private val firstMessage: String): OpenaiLLM {
@@ -192,7 +131,7 @@ class OpenIllegitimateSummarize(private val apiKey: String, private val firstMes
         titleMessage.add(
             ChatMessage(
                 role = ChatRole.User,
-                content = "다음 내용을 바탕으로 대화 주제가 무엇인지 간략하게 요약해줘:\n$firstMessage" // 👈
+                content = "다음 내용을 바탕으로 대화 주제가 무엇인지 간략하게 요약해줘:\n$firstMessage"
             )
         )
     }

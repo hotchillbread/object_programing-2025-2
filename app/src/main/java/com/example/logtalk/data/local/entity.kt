@@ -6,18 +6,18 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "title")
-data class TitleData(
+data class Title(
     @PrimaryKey(autoGenerate = true)
     val titleId: Long = 0L,
     val title: String,
-    val embedding: ByteArray?, // 1024차원 벡터 저장 (TypeConverter 필요)
+    val embedding: ByteArray, // 1024차원 벡터 저장 (TypeConverter 필요)
     val createdAt: Long = System.currentTimeMillis()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as TitleData
+        other as Title
 
         if (titleId != other.titleId) return false
         if (createdAt != other.createdAt) return false
@@ -40,7 +40,7 @@ data class TitleData(
     tableName = "messages",
     foreignKeys = [
         ForeignKey(
-            entity = TitleData::class,
+            entity = Title::class,
             parentColumns = ["titleId"], // 부모 테이블의 컬럼
             childColumns = ["parentTitleId"], // 자식 테이블의 컬럼
             onDelete = ForeignKey.CASCADE // 부모가 삭제되면 자식도 삭제 (종속성 확보)

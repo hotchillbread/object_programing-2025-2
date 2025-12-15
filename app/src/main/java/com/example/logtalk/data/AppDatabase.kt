@@ -7,13 +7,11 @@ import androidx.room.RoomDatabase
 import com.example.logtalk.core.utils.Logger
 import com.example.logtalk.data.local.MessageDao
 import com.example.logtalk.data.local.MessageData
-import com.example.logtalk.data.local.TitleData
 import com.example.logtalk.data.local.TitleDao
 import com.example.logtalk.data.local.UserDao
 import com.example.logtalk.data.local.UserProfile
 
 @Database(
-    entities = [TitleData::class, MessageData::class, UserProfile::class],
     version = 1,
     exportSchema = false
 )
