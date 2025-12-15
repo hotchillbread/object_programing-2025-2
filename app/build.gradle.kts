@@ -50,6 +50,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "17"
@@ -63,6 +64,9 @@ android {
 }
 
 dependencies {
+
+    // Java 8+ API desugaring (java.time 패키지 등을 API 24+에서 사용 가능)
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     // 기본 compose, android 의존성 패키지
     implementation(libs.androidx.core.ktx)

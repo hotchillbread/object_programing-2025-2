@@ -30,7 +30,6 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
-import com.example.logtalk.ui.chat.data.Message
 import com.example.logtalk.ui.chat.screen.ChatScreen
 import com.example.logtalk.ui.chat.viewmodel.ChatViewModel
 import com.example.logtalk.ui.navigation.MainScreenRoutes
@@ -42,7 +41,7 @@ import com.example.logtalk.ui.navigation.OtherScreenRoutes
 import com.example.logtalk.ui.groomy.GroomyScreen
 
 @Composable
-fun MainScreen(rootNavController: NavController) {
+fun MainScreen() {
     val view = LocalView.current
     val window = (view.context as Activity).window
 
@@ -139,29 +138,39 @@ fun MainScreen(rootNavController: NavController) {
                 HomeScreen(
                     onGroomyClick = {
                         mainNavController.navigate(OtherScreenRoutes.GROOMY)
+                    },
+                    onSessionClick = { sessionId ->
+                        // 기존 세션 클릭 시 해당 채팅방으로 이동
+                        mainNavController.navigate("${MainScreenRoutes.Chat.route}/$sessionId")
+                    },
+                    onNewChatClick = {
+                        // 새 채팅 시작 시 titleId = -1로 이동 (새 세션 생성)
+                        mainNavController.navigate("${MainScreenRoutes.Chat.route}/-1")
                     }
                 )
             }
 
             //chat route
             composable(
-                route = "${MainScreenRoutes.Chat.route}?sessionId={sessionId}",
-                arguments = listOf(navArgument("sessionId") { 
+                route = "${MainScreenRoutes.Chat.route}/{titleId}", // "chat/{titleId}" 경로
+                arguments = listOf(navArgument("titleId") {
                     type = NavType.LongType
-                    defaultValue = -1L
+                    defaultValue = -1L //
                 })
             ) { backStackEntry ->
-                val sessionId = backStackEntry.arguments?.getLong("sessionId") ?: -1L
-                val chatViewModel = hiltViewModel<ChatViewModel>()
 
+                val chatViewModel = hiltViewModel<ChatViewModel>(backStackEntry)
+
+                //ChatScreen 호출 및 모든 콜백 연결
                 ChatScreen(
                     onBackClick = {
-                        mainNavController.popBackStack()
+                        mainNavController.popBackStack() // HomeScreen으로 돌아가기
                     },
+                    // TODO: 유사 상담 화면으로 이동하는 Navigation 로직 연결
                     onNavigateToSimilarConsultation = {
-                        if (sessionId != -1L) {
-                            rootNavController.navigate("${MainScreenRoutes.RelatedChat.route}/$sessionId")
-                        }
+                        // mainNavController.navigate("similar_consultation_route")
+                        // 임시로 뒤로가기 대신 로그를 남김
+                        println("DEBUG: Navigate to Similar Consultation")
                     },
                     viewModel = chatViewModel
                 )
