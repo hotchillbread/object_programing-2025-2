@@ -39,7 +39,7 @@ import com.example.logtalk.ui.home.HomeScreen
 import com.example.logtalk.ui.navigation.OtherScreenRoutes
 import com.example.logtalk.ui.groomy.GroomyScreen
 
-@Composable
+@Composable //흠
 fun MainScreen() {
     val view = LocalView.current
     val window = (view.context as Activity).window
