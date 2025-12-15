@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -41,7 +42,7 @@ import com.example.logtalk.ui.navigation.OtherScreenRoutes
 import com.example.logtalk.ui.groomy.GroomyScreen
 
 @Composable
-fun MainScreen() {
+fun MainScreen(rootNavController: NavController) {
     val view = LocalView.current
     val window = (view.context as Activity).window
 
@@ -144,27 +145,23 @@ fun MainScreen() {
 
             //chat route
             composable(
-                route = MainScreenRoutes.Chat.route, // "chat/{titleId}" 경로
-                arguments = listOf(navArgument("titleId") {
+                route = "${MainScreenRoutes.Chat.route}?sessionId={sessionId}",
+                arguments = listOf(navArgument("sessionId") { 
                     type = NavType.LongType
-                    defaultValue = -1L //
+                    defaultValue = -1L
                 })
             ) { backStackEntry ->
-                //
-                val initialTitleId = backStackEntry.arguments?.getLong("titleId") ?: -1L
+                val sessionId = backStackEntry.arguments?.getLong("sessionId") ?: -1L
+                val chatViewModel = hiltViewModel<ChatViewModel>()
 
-                val chatViewModel = hiltViewModel<ChatViewModel>(backStackEntry)
-
-                //ChatScreen 호출 및 모든 콜백 연결
                 ChatScreen(
                     onBackClick = {
-                        mainNavController.popBackStack() // HomeScreen으로 돌아가기
+                        mainNavController.popBackStack()
                     },
-                    // TODO: 유사 상담 화면으로 이동하는 Navigation 로직 연결
                     onNavigateToSimilarConsultation = {
-                        // mainNavController.navigate("similar_consultation_route")
-                        // 임시로 뒤로가기 대신 로그를 남김
-                        println("DEBUG: Navigate to Similar Consultation")
+                        if (sessionId != -1L) {
+                            rootNavController.navigate("${MainScreenRoutes.RelatedChat.route}/$sessionId")
+                        }
                     },
                     viewModel = chatViewModel
                 )

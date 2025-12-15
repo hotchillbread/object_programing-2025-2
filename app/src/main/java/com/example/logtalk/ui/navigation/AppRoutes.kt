@@ -25,6 +25,7 @@ sealed class MainScreenRoutes(
     object Home : MainScreenRoutes("home", "홈", Icons.Default.Home)
     object Chat : MainScreenRoutes("chat", "채팅", Icons.Default.ChatBubble)
     object Settings : MainScreenRoutes("settings", "설정", Icons.Default.Settings)
+    object RelatedChat : MainScreenRoutes("related_chat", "유사 상담", Icons.Default.ChatBubble) // Added for similar chats
 }
 
 //인증 라우트

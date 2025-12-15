@@ -33,7 +33,6 @@ object EnvManager {
                     onComplete(true)
                 } else {
                     Logger.e("Remote Config 패치 실패")
-
                     onComplete(false)
                 }
             }

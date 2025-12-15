@@ -9,7 +9,6 @@ import com.example.logtalk.data.AppDatabase
 
 @HiltAndroidApp
 class App : Application() {
-
     override fun onCreate() {
         super.onCreate()
 
