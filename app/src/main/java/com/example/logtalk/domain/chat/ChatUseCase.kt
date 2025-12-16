@@ -92,7 +92,7 @@ class GenerateAndSaveTitleUseCase @Inject constructor(
         val embeddingList: List<List<Double>> = embeddingGenerator.createEmbeddings(listOf(newTitleText))
 
         val doubleEmbedding: List<Double>? = embeddingList.firstOrNull()
-        Logger.d(doubleEmbedding.toString())
+
         if (doubleEmbedding == null) {
             Logger.e("Embedding 생성 실패: $newTitleText 에 대한 임베딩 벡터를 얻지 못했습니다.")
             return

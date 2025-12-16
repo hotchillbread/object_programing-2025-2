@@ -115,33 +115,29 @@ class OpenAILLMChatService(
     }
 }
 
-class OpenIllegitimateSummarize(private val apiKey: String): OpenaiLLM { // 💡 firstMessage를 생성자에서 제거!
+class OpenIllegitimateSummarize(private val apiKey: String): OpenaiLLM {
 
     private val client = OpenAI(
         token = apiKey,
         timeout = Timeout(socket = 60.seconds)
     )
 
-    override suspend fun getResponse(prompt: String): String { // 💡 prompt 인자를 요약할 텍스트로 사용
-
-        // 1. System Role로 명확한 지침을 전달합니다. (가장 중요)
-        val systemMessage = ChatMessage(
-            role = ChatRole.System,
-            content = "You are an expert title generator. Your task is to summarize the following user's first message into a short, concise title for a conversation. The title must be in Korean and strictly contain only the title text."
+    override suspend fun getResponse(prompt: String): String {
+        val titleMessage = listOf(
+            ChatMessage(
+                role = ChatRole.System,
+                content = "You are a title generator. Summarize the following user's first message into a short, concise title for a conversation. The title should be in Korean."
+            ),
+            ChatMessage(
+                role = ChatRole.User,
+                content = prompt
+            )
         )
-
-        // 2. User Role로 요약할 실제 메시지를 전달합니다.
-        val userMessage = ChatMessage(
-            role = ChatRole.User,
-            content = prompt // 💡 getResponse의 인자로 받은 prompt를 요약 대상으로 사용
-        )
-
-        val messages = listOf(systemMessage, userMessage) // 3. List 구성
 
         val request = ChatCompletionRequest(
             model = ModelId("gpt-4o-mini"),
-            messages = messages, // 4. 새로 구성된 List 사용
-            maxTokens = 50 // 💡 제목이므로 maxTokens를 낮춰서 비용과 속도 최적화
+            messages = titleMessage,
+            maxTokens = 50
         )
 
         val response = client.chatCompletion(request)
