@@ -5,6 +5,7 @@ import com.example.logtalk.data.local.TitleDao
 import com.example.logtalk.data.local.TitleData
 import com.example.logtalk.domain.relatedChat.RelatedChatRepository
 import javax.inject.Inject
+import com.example.logtalk.core.utils.Logger
 
 class RelatedChatRepositoryImpl @Inject constructor(
     private val titleDao: TitleDao,
@@ -16,7 +17,9 @@ class RelatedChatRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getAllEmbeddingsForAnalysis(currentTitleId: Long): List<TitleData> {
-        return titleDao.getAllEmbeddingsExceptCurrent(currentTitleId)
+        val r = titleDao.getAllEmbeddingsExceptCurrent(currentTitleId)
+        Logger.d(r.toString())
+        return r
     }
 
     override suspend fun getFirstMessageContent(titleId: Long): String? {

@@ -21,7 +21,7 @@ import com.example.logtalk.ui.theme.ChatColors // 가정된 색상
 @Composable
 public fun ChatScreen(
     onBackClick: () -> Unit,
-    onNavigateToSimilarConsultation: () -> Unit, // TODO: 유사 상담 화면으로 이동 콜백 추가
+    onNavigateToSimilarConsultation: () -> Unit,
 
     viewModel: ChatViewModel
 ) {
@@ -57,7 +57,6 @@ public fun ChatScreen(
                 modifier = Modifier.weight(1f)
             )
 
-            // ✨ 로딩 인디케이터 표시
             if (uiState.isLoading) {
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth().height(4.dp),

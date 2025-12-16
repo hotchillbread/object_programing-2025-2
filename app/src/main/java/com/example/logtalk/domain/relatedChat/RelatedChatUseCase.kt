@@ -28,7 +28,6 @@ class FindRelatedConsultationsUseCaseImpl @Inject constructor(
 
     override suspend operator fun invoke(currentTitleId: Long, topN: Int): List<RelatedConsultationItem> {
 
-
         val currentTitle = repository.getCurrentConsultationTitle(currentTitleId) ?: return emptyList()
 
         val currentEmbeddingList = embeddingService.createEmbeddings(listOf(currentTitle)).firstOrNull() ?: return emptyList()
