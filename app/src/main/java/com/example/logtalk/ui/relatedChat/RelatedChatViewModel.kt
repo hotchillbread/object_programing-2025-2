@@ -1,6 +1,7 @@
 package com.example.logtalk.ui.chat.viewmodel
 
 import androidx.compose.runtime.Immutable
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.logtalk.domain.relatedChat.FindRelatedConsultationsUseCase
@@ -9,6 +10,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.example.logtalk.core.utils.Logger
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 data class RelatedConsultationItem(
     val id: String,
@@ -24,12 +27,14 @@ data class RelatedChatUiState(
     val errorMessage: String? = null,
     val relatedChats: List<RelatedConsultationItem> = emptyList()
 )
-class RelatedChatViewModel(
-    private val consultationId: String, // 현재 상담의 ID (String)
+@HiltViewModel
+class RelatedChatViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle, // 현재 상담의 ID (String)
     private val findRelatedConsultationsUseCase: FindRelatedConsultationsUseCase // Use Case 주입
 ) : ViewModel() {
 
-    // 1. _uiState 필드 정의 (인식이 안 되는 오류 해결)
+    private val consultationId: String = savedStateHandle.get<String>("consultationId")
+        ?: throw IllegalArgumentException("아이디가 빠졌어요")
     private val _uiState = MutableStateFlow(RelatedChatUiState(isLoading = true))
     val uiState: StateFlow<RelatedChatUiState> = _uiState.asStateFlow()
 
