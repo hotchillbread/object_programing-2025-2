@@ -239,7 +239,7 @@ fun MessageInput(
                 ) {
                     if (currentText.isEmpty()) {
                         Text(
-                            text = "메시지 전송하기",
+                            text = "고민을 입력해주세요",
                             fontSize = 16.sp,
                             color = Color.Gray.copy(alpha = 0.7f)
                         )
