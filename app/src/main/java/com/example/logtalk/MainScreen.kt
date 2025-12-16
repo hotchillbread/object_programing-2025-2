@@ -192,7 +192,7 @@ fun MainScreen() {
             ) { backStackEntry ->
                 val consultationId = backStackEntry.arguments?.getString("consultationId") ?: ""
 
-                val relatedChatViewModel = RelatedChatViewModel(consultationId = consultationId)
+                val relatedChatViewModel = hiltViewModel<RelatedChatViewModel>(backStackEntry)
 
                 RelatedChatScreen(
                     onBackClick = {

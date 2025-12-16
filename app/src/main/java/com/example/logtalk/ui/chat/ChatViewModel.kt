@@ -107,7 +107,7 @@ class ChatViewModel @Inject constructor(
                 sendMessageUseCase(userMessageText, history, currentTitleId)
 
                 if (!isFirstMessageSent) {
-                    Logger.d("TITLE GENERATION INPUT: $userMessageText")
+                    Logger.d("제목 텍스트: $userMessageText")
                     generateAndSaveTitleUseCase(currentTitleId, userMessageText)
                     isFirstMessageSent = true
                 }
