@@ -182,7 +182,7 @@ fun MainScreen() {
                         mainNavController.popBackStack() // 이전 화면으로 돌아가기
                     },
                     onNavigateToSimilarConsultation = {
-                        mainNavController.navigate("related_chat/$currentChatId")
+                        mainNavController.navigate("related_chat/${currentChatId.toString()}")
                     },
                     viewModel = chatViewModel
                 )
@@ -201,6 +201,13 @@ fun MainScreen() {
                 RelatedChatScreen(
                     onBackClick = {
                         mainNavController.popBackStack() // 뒤로가기(채팅으로)
+                    },
+                    onConsultationSelected = { selectedChatId ->
+                        mainNavController.popBackStack()
+
+                        mainNavController.navigate("${MainScreenRoutes.Chat.route}/$selectedChatId") {
+                            launchSingleTop = true
+                        }
                     },
                     viewModel = relatedChatViewModel
                 )
