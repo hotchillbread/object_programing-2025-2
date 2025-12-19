@@ -46,7 +46,6 @@ class CreateNewChatUseCase @Inject constructor(
             embedding = null,
             createdAt = System.currentTimeMillis()
         )
-
         return chatRepository.insertTitle(newTitle)
     }
 }
